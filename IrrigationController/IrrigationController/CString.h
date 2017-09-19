@@ -142,6 +142,7 @@ class CString
     //****************************************************************
     //* Concatenation operator functions
     //****************************************************************
+    void operator +=(IPAddress& ip);
     void operator +=(CString& str);    
     void operator +=(const char* str);    
     void operator +=(const char cCh);

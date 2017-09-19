@@ -68,6 +68,18 @@ void CString::operator +=(const char cCh)
   }
 }
   
+void CString::operator +=(IPAddress& ip)
+{
+  if ((length() + 16)  >= m_nBuffSize)
+  {
+    const uint8_t nSize = 20;
+    char strIP[nSize];
+    memset(strIP, 0, nSize);
+    sprintf(strIP, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+    *this += strIP;
+  }
+}
+
 void CString::operator +=(CString& str)
 {
   if ((strlen(m_strBuff) + str.length() + 1) <= m_nBuffSize)
@@ -121,19 +133,11 @@ CString& CString::operator =(IPAddress& ip)
 {
   if (m_nBuffSize >= 16)
   {
-    char strTemp[16], strDot[2] = ".";
-    memset(strTemp, 0, 16);
-    
-    strcat(strTemp, fromUint(ip[0]));
-    strcat(strTemp, strDot);
-    strcat(strTemp, fromUint(ip[1]));
-    strcat(strTemp, strDot);
-    strcat(strTemp, fromUint(ip[2]));
-    strcat(strTemp, strDot);
-    strcat(strTemp, fromUint(ip[3]));
-  
-    if (strlen(strTemp) < capacity())
-      *this = strTemp;
+    const uint8_t nSize = 20;
+    char strIP[nSize];
+    memset(strIP, 0, nSize);
+    sprintf(strIP, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+    *this = strIP;
   }
   return *this;
 }
