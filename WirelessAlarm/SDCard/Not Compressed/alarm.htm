@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+	<head>
+		<meta content="en-au" http-equiv="Content-Language" />
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+		
+		<style>
+			.Hyperlink
+			{
+				background-color:olive;
+				width:300px;
+				height:25px;
+				vertical-align:middle;
+				text-align:center;
+				border-radius:5px;
+				border: 2px solid olive;
+				margin-bottom:10px;	
+			}
+			.SansSerif
+			{
+				font-family:Arial,Helvetica,sans-serif
+			}
+			.White
+			{
+				color:white
+			}
+			.Red
+			{
+				color:red
+			}
+			.Heading
+			{
+				font-size:xx-large
+			}
+			.Large
+			{
+				font-size:large
+			}
+			.Medium
+			{
+				font-size:medium
+			}
+			.BorderInset
+			{
+				border:2px inset silver;
+				border-radius:3px;
+			}
+			.BorderOutset
+			{
+				border:2px outset silver
+				border-radius:3px;
+			}
+			.BorderBottom
+			{
+				border-bottom:3px ridge silver
+			}
+			.BorderTop
+			{
+				border-top:3px ridge silver
+			}
+			.BorderLeft
+			{
+				border-left:3px ridge silver
+			}
+			.BorderRight
+			{
+				border-right:3px ridge silver
+			}
+			.Teal
+			{
+				background:teal;
+			}
+			.Margin10Px
+			{
+				margin:10px 10px 10px 10px;
+			}
+			.TableStyle
+			{
+				width:100%;
+				border-collapse:collapse;
+			}
+			.Height20Px
+			{
+				height:20px;
+			}
+		</style>
+		
+		<script type="text/javascript">
+					
+			function GetInput(strID)
+			{
+				var input = document.getElementById(strID);
+				
+				if (!input)
+					alert("ERROR: function GetInput(strID), strID = " + strID + "!");
+					
+				return input;
+			}
+			
+			function OnClickAuto(strAutoID, strOnTimeID)
+			{
+				GetInput(strOnTimeID).disabled = !GetInput(strAutoID).checked;
+			}
+						
+		</script>
+		
+	</head>
+	
+	<body class="Teal" onload="OnLoad()">
+	
+		<div style="visibility:visible;" class="SansSerif Black" id="Main">
+			<span id="Message" class="Heading Red"><strong>Please be patient while the web page downloads from the irrigation controller...</strong></span>
+			<br />
+			<span class="Heading"><strong><u>
+				<br />
+				Greg's Wirless Soil Moisture Probe</u></strong></span><span class="Medium"><br /><br />The user manual can be found at:<br />
+				<a href="http://www.gregsindigenouslandscapes.com.au/UserManual.php">http://www.gregsindigenouslandscapes.com.au/UserManual.php</a>
+			<br />
+			<div class="\\Hyperlink">
+				<a href="controller.htm" class="Large"><b>Go to controller settings</b></a>
+			</div>
+			<div class="\\Hyperlink">
+				<a href="station.htm" class="Large"><b>Go to station settings</b></a>
+			</div>
+			<br>
+			</span>&nbsp;<form action="alarm.htm" method="GET" id="AlarmsForm" accept-charset="ASCII" style="background-color:silver;border:medium silver outset;border-radius:3px;width:80%">
+						<div class="Heading" style="color:blue;margin:10px 10px 10px 12px">
+							<b>Alarm Settings</b></div>
+						<div class="Medium" style="color:black;margin:10px 10px 20px 12px">
+							For probe theshold values, less than 740 indicates 
+							bone dry soil while 1000 or greater indicates sopping wet soil.<br />
+							<br />
+							If you click 'Auto' the station will be truned on 
+							for specified number of minutes when ever the probe reading remains 
+							below the specified value for the specified number 
+							of minutes.</div>
+							<table class="TableStyle" style="border:0px silver solid">
+								<tr>
+									<td colspan="2" valign="middle" align="left">
+										Station description:
+									</td>
+									<td colspan="5" valign="middle" align="left">
+										<input class="BorderInset Height20Px" name="Desc" id="Desc" maxlength="16" type="text" value="XXXX" tabindex="1" />
+									</td>
+								</tr>
+								<tr>
+									<td colspan="7" valign="middle" align="left">
+									&nbsp;
+									</td>
+								</tr>
+								<tr>
+									<td valign="middle" align="left">
+									<input name="Auto" id="Auto" type="checkbox" onclick="OnClickAuto('Auto', 'OnTime')" tabindex="1" value="XXXX" />Auto</td>
+									<td valign="middle" align="right">Allowed dry time (min):</td>
+									<td valign="middle" align="left">
+									<input class="BorderInset Height20Px" name="DryTime" id="DryTime" type="number" value="10" min="10" max="360" tabindex="3" /></td>
+									<td valign="middle" align="right">Probe threshold value:</td>
+									<td valign="middle" align="left">
+									<input class="BorderInset Height20Px" value="750" name="Thresh" id="Thresh" type="number" tabindex="4" /></td>
+									<td valign="middle" align="right">On time (minutes):</td>
+									<td valign="middle" align="left">
+									<input class="BorderInset Height20Px" value="10" name="OnTime" id="OnTime" type="number" disabled="disabled" tabindex="5" /></td>
+								</tr>
+							</table><br>
+							<table class="TableStyle">
+							<tr>
+								<td valign="middle" align="center" colspan="2">
+									<input style="width:240px" class="BorderOutset" name="Upload" type="submit" value="Save alarm details" tabindex="6" />&nbsp;&nbsp;&nbsp;&nbsp;
+									<input style="width:240px" class="BorderOutset" name="Clear" type="reset" value="Clear form and start over" tabindex="7" />
+								</td>
+							</tr>
+							<tr>
+								<td class="Large SansSerif" style="color:teal" valign="middle" align="center" colspan="2">
+									Alarm details have not been uploaded yet...
+								</td>
+							</tr>
+						</table>
+						<br />
+				</form>
+		</div>
+	
+	</body>
+	
+	<footer>
+	
+		<script type="text/javascript">
+			
+			GetInput("Message").style.display = "none";
+			GetInput("Main").style.visibility = "visible";
+	
+			GetInput("OnTime").disabled = !GetInput("Auto").checked;
+	
+		</script>
+		
+	</footer>
+	
+</html>
