@@ -1,0 +1,24 @@
+station1
+	description:Front
+	suspend:
+station2
+	description:Back
+	suspend:
+station3
+	description:Side
+	suspend:
+station4
+	description:Veges
+	suspend:
+station5
+	description:5555
+	suspend:
+station6
+	description:6666
+	suspend:
+station7
+	description:7777
+	suspend:
+station8
+	description:8888
+	suspend:

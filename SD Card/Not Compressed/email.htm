@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+	<head>
+		<meta content="en-au" http-equiv="Content-Language" />
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+		<title>Email Settings</title>
+		<style>
+			.Hyperlink
+			{
+				background-color:olive;
+				width:300px;
+				height:25px;
+				vertical-align:middle;
+				text-align:center;
+				border-radius:5px;
+				border: 2px solid olive;
+				margin-bottom:10px;	
+			}
+			.SansSerif
+			{
+				font-family:Arial,Helvetica,sans-serif
+			}
+			.White
+			{
+				color:white
+			}
+			.Red
+			{
+				color:red
+			}
+			.Heading
+			{
+				font-size:xx-large
+			}
+			.Large
+			{
+				font-size:large
+			}
+			.Medium
+			{
+				font-size:medium
+			}
+			.BorderInset
+			{
+				border:2px inset silver;
+				border-radius:3px;
+			}
+			.BorderOutset
+			{
+				border:2px outset silver
+				border-radius:3px;
+			}
+			.BorderBottom
+			{
+				border-bottom:3px ridge silver
+			}
+			.BorderTop
+			{
+				border-top:3px ridge silver
+			}
+			.BorderLeft
+			{
+				border-left:3px ridge silver
+			}
+			.BorderRight
+			{
+				border-right:3px ridge silver
+			}
+			.Teal
+			{
+				background:teal;
+			}
+		</style>
+		
+	</head>
+	
+	<body class="Teal" onload="OnLoad()">
+	
+		<div style="visibility:visible;" class="SansSerif Black" id="Main">
+			<span id="Message" class="Heading Red"><strong>Please be patient while the web page downloads from the irrigation controller...</strong></span>
+			<br />
+			<span class="Heading"><strong><u>
+			<br />
+			Greg's Irrigation Controller - ####</u></strong></span>
+			<span class="Medium"><br /><br />The user manual can be found at:<br />
+				<a href="http://www.gregsindigenouslandscapes.com.au/UserManual.php">http://www.gregsindigenouslandscapes.com.au/UserManual.php</a>
+			<br />
+			</span>
+			<br />
+			<div class="Hyperlink">
+				<a href="program.htm" class="Large"><b>Go to irrigation program</b></a>
+			</div>
+			<div class="Hyperlink">
+				<a href="clock.htm" class="Large"><b>Go to system clock</b></a>
+			</div>
+			<div class="Hyperlink">
+				<a href="manual.htm" class="Large"><b>Go to manual control</b></a>
+			</div>
+			<div class="Hyperlink">
+				<a href="walarms.htm" class="Large"><b>Go to alarm settings</b></a>
+			</div>
+			&nbsp;<form action="email.htm" method="GET" id="EmailForm"  accept-charset="ASCII" style="background-color:silver;border:medium silver outset;border-radius:3px;width:52%">
+						<div class="Heading" style="color:blue;margin:10px 10px 10px 12px"><b>Email settings (for alarm notifications)</b></div>
+						<table style="width:100%;border-collapse:collapse;">
+							<tr>
+								<td valign="middle" align="right">Email address for alarm notification:&nbsp;</td>
+								<td valign="middle" align="left"><input class="BorderInset" name="Email" value="" type="email" style="width: 300px" /></td>
+							</tr>
+							<tr>
+								<td valign="middle" align="right">Outgoing email server:&nbsp;</td>
+								<td valign="middle" align="left"><input class="BorderInset" name="Server" value="" type="text" style="width: 300px" /></td>
+							</tr>
+							<tr>
+								<td valign="middle" align="right">Mail server user name:&nbsp;</td>
+								<td valign="middle" align="left"><input class="BorderInset" name="Username" value="" type="text" style="width: 300px" /></td>
+							</tr>
+							<tr>
+								<td valign="middle" align="right">Mail server user password:&nbsp;</td>
+								<td valign="middle" align="left"><input class="BorderInset" name="Password" value="" type="text" style="width: 300px" /></td>
+							</tr>
+							<tr>
+								<td valign="middle" align="center">&nbsp;</td>
+								<td valign="middle" align="center">&nbsp;</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="center" colspan="2">
+									<input style="width:270px" class="BorderOutset" name="Upload" type="submit" value="Upload email settings to irrigation controller" />&nbsp;&nbsp;&nbsp;&nbsp;
+									<input style="width:270px" class="BorderOutset" name="Clear" type="reset" value="Clear form and start over" />
+								</td>
+							</tr>
+							<tr>
+								<td class="Large SansSerif" style="color:teal" valign="middle" align="center" colspan="2">
+									Email settings have not been uploaded yet...
+								</td>
+							</tr>
+						</table>
+						<br />
+				</form>
+		</div>
+	
+	</body>
+	
+	<footer>
+	
+		<script type="text/javascript">
+			
+			function GetInput(strID)
+			{
+				var input = document.getElementById(strID);
+				
+				if (!input)
+					alert("ERROR: function GetInput(strID), strID = " + strID + "!");
+					
+				return input;
+			}
+				
+			GetInput("Message").style.display = "none";
+			GetInput("Main").style.visibility = "visible";
+	
+		</script>
+		
+	</footer>
+	
+</html>

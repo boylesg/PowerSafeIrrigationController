@@ -1,0 +1,48 @@
+station1
+	probe:
+	allowed_dry_time:0
+	probe_threshold_value:0
+	probe_auto:
+	auto_runtime:0
+station2
+	probe:installed
+	allowed_dry_time:10
+	probe_threshold_value:50
+	probe_auto:yes
+	auto_runtime:1
+station3
+	probe:
+	allowed_dry_time:0
+	probe_threshold_value:0
+	probe_auto:
+	auto_runtime:0
+station4
+	probe:
+	allowed_dry_time:0
+	probe_threshold_value:0
+	probe_auto:
+	auto_runtime:0
+station5
+	probe:
+	allowed_dry_time:0
+	probe_threshold_value:0
+	probe_auto:
+	auto_runtime:0
+station6
+	probe:
+	allowed_dry_time:0
+	probe_threshold_value:0
+	probe_auto:
+	auto_runtime:0
+station7
+	probe:
+	allowed_dry_time:0
+	probe_threshold_value:0
+	probe_auto:
+	auto_runtime:0
+station8
+	probe:
+	allowed_dry_time:0
+	probe_threshold_value:0
+	probe_auto:
+	auto_runtime:0

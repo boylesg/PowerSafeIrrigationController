@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html PUBLIC"-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns=
+"http://www.w3.org/1999/xhtml"><head><meta content="en-au"http-equiv="Content-Language"/><meta content="text/html; charset=utf-8"http-equiv=
+"Content-Type"/><style type="text/css">.Link{background-color:olive;width:300px;height:25px;vertical-align:middle;text-align:center;border-radius:5px;
+border:2px solid olive;margin-bottom:10px}.Font{font-family:Arial,Helvetica,sans-serif}.Blck{color:black}.Red{color:red}.Head{font-size:xx-large}
+.Large{font-size:large}.Medium{font-size:medium}.Small{font-size:small}.BrdIns{border:2px inset silver;border-radius:3px}.BrdOuts{border:
+2px outset silver;border-radius:3px}.BrdBttm{border-bottom:3px ridge silver}.BrdTp{border-top:3px ridge silver}.BrdLft{border-left:3px ridge silver}
+.BrdRght{border-right:3px ridge silver}.Teal{background:teal}</style><title>Irrigation Settings</title></head><body class="Teal Font"onload="OnLoad()">
+<span id="Message"class="Head Red"><strong><br/>Please be patient while the web page downloads from the irrigation controller...</strong></span>
+<script type="text/javascript">var arrySt=new Array();function strctSt(c,j,i,g,a,e,h,b,k,f,d){this.sD=c;this.nRF=j;this.nSF=i;this.sSD=g;this.sED=a;this.sST=h;
+this.sET=b;this.sRT=k;this.nRnF=f;this.arryD=e;this.arryT=d}
+arrySt.push(new strctSt("desc",radfreq,selfreq,"startdate","enddate",new Array(),"starttime","endtime","runtime",runfreq,new Array()));
+arrySt.push(new strctSt("desc",radfreq,selfreq,"startdate","enddate",new Array(),"starttime","endtime","runtime",runfreq,new Array()));
+arrySt.push(new strctSt("desc",radfreq,selfreq,"startdate","enddate",new Array(),"starttime","endtime","runtime",runfreq,new Array()));
+arrySt.push(new strctSt("desc",radfreq,selfreq,"startdate","enddate",new Array(),"starttime","endtime","runtime",runfreq,new Array()));
+arrySt.push(new strctSt("desc",radfreq,selfreq,"startdate","enddate",new Array(),"starttime","endtime","runtime",runfreq,new Array()));
+arrySt.push(new strctSt("desc",radfreq,selfreq,"startdate","enddate",new Array(),"starttime","endtime","runtime",runfreq,new Array()));
+arrySt.push(new strctSt("desc",radfreq,selfreq,"startdate","enddate",new Array(),"starttime","endtime","runtime",runfreq,new Array()));
+arrySt.push(new strctSt("desc",radfreq,selfreq,"startdate","enddate",new Array(),"starttime","endtime","runtime",runfreq,new Array()));
+function GI(b){var a=document.getElementById(b);if(!a){alert("Input with ID '"+b+"!")}return a}function VRT(d,c){var b=true;var a=Number(d);if((d.
+length==0)&&c){alert("'Run time' must be between 0 and 30 minutes!");b=false}else{b=a!=NaN;b&=a>=0;b&=a<=30;if(!b&&c){alert(
+"'Run time' must be between 0 and 30 minutes!")}}return b}function VT(g,d){var b=true;var e=0;var c="";var a="";var f="";if((g.length==0)&&(d!=
+null)){alert(d+"cannot be blank!");b=false}else{e=g.indexOf(":");if(e==-1){b=false}else{a=g.substring(0,e);f=g.substring(e+1,g.length);b=(Number(a)
+!=NaN)&&(Number(f)!=NaN)&&(Number(a)>=0)&&(Number(a)<=23)&&(Number(f)>=0)&&(Number(f)<=59)}if(!b&&(d!=null)){c="'";c+=g+"' is not a valid time!";
+alert(c)}}return b}function OCD(){var a=arrySt[GSS()-1];a.sD=GI("Desc").value}function GSS(){var a=GI("SelStation");return a.options[a.selectedIndex].
+value}function SRF(a){GI("RadFrqMn").checked=false;GI("RadFrqWk").checked=false;GI("RadFrqDaily").checked=false;switch(a){case 1:GI("RadFrqMn").checked
+=true;break;case 2:GI("RadFrqWk").checked=true;break;case 3:GI("RadFrqDaily").checked=true;break;default:GI("RadFrqMn").checked=true}}function SSF(b,a){
+switch(b){case 1:GI("SelMnFreq").selectedIndex=a;break;case 2:GI("SelWkFreq").selectedIndex=a;break;case 3:GI("SelDyFreq").selectedIndex=a;break}}function 
+EUB(){var b=false;for(var a=0;a<8;a++){b|=arrySt[a].arryD.length>0;if(b){break}}GI("ButtonUpload").disabled=!b}function GDFDOY(b){var a=new Date(new Date
+().getFullYear(),0);a=new Date(a.setDate(b));return a}function GRT(c){var b="";for(var a=0;a<c.length;a++){b+=c[a];if(a<(c.length-1)){b+=", "}}return b}
+function ESF(b){var d=false;var c=false;var a=false;switch(b){case 1:d=true;break;case 2:c=true;break;case 3:a=true;break;default:d=true}GI("SelMnFreq").
+disabled=!d;GI("SelWkFreq").disabled=!c;GI("SelDyFreq").disabled=!a}function ORF(b){var c=GSS();var a=arrySt[c-1];ESF(b);if(a.nRF!=b){a.nRF=b;a.nSF=1;UL(c)}}
+function HY(a){var b=a.indexOf("/");b=a.indexOf("/",b+1);return b>=0}function E(a){while(a.length>0){a.pop()}}function R(b){if((b>=1)&&(b<=8)){var a=
+arrySt[b-1];GI("Desc").value=a.sD;if((a.nRF>=1)&&(a.nRF<=3)){SRF(a.nRF)}else{SRF(1)}if(((a.nRF==1)&&(a.nSF>=0)&&(a.nSF<=3))||((a.nRF==2)&&(a.nSF>=0)&&(a.
+nSF<=2))||((a.nRF==3)&&(a.nSF>=0)&&(a.nSF<=5))){SSF(a.nRF,a.nSF)}else{SSF(1,0)}if(VD(a.sSD,null)){GI("TxtStDate").value=a.sSD}else{GI("TxtStDate").value=
+""}if(VD(a.sED,null)){GI("TxtEnDate").value=a.sED}else{GI("TxtEnDate").value=""}if(VT(a.sST,null)){GI("TimeStart").value=a.sST}else{GI("TimeStart").value=
+"00:00"}if(VT(a.sET,null)){GI("TimeEnd").value=a.sET}else{GI("TimeEnd").value="00:00"}if(VRT(a.sRT,null)){GI("NumRnTm").value=a.sRT}else{GI("NumRnTm").
+value="0"}if((a.nRnF>=0)&&(a.nRnF<=6)){GI("SelRnFreq").selectedIndex=a.nRnF}else{GI("SelRnFreq").selectedIndex=0}RestList("SelRnTms",a.arryT);RestList(
+"SelDts",a.arryD)}}function OSC(){var b=GI("SelStation");var c=b.options[b.selectedIndex].value;var a=arrySt[c-1];R(c);ORF(a.nRF)}function VD(f,e){var c=
+false;var b=0,a=0;var g=0,d=0;var h="";b=f.indexOf("/");if(b>=0){h=f.substring(0,b);g=Number(h)}a=f.indexOf("/",b+1);if(a>=0){h=f.substring(b+1,a);d=
+Number(h)}else{h=f.substring(b+1,f.length);d=Number(h)}c=(d>=1)&&(d<=12)&&(g>=1)&&(g<=28);if(!c&&(e!=null)){alert(e+"("+f+") is not a valid date!")}return 
+c}function VSD(){var b=false;var c=GI("TxtStDate").value,e=GI("TxtEnDate").value;var a=Date.parse(c),d=Date.parse(e);if((c.length==0)&&(e.length>0)){if(
+isNaN(d)){alert("Valid full date required for suspend end date!");GI("TxtEnDate").focus()}else{alert("Suspend start date cannot be blank!");GI(
+"TxtStDate").focus()}b=false}else{if((c.length>0)&&(e.length==0)){if(isNaN(a)){alert("Valid full date required for suspend start date!");GI("TxtStDate").
+focus()}else{alert("Suspend end date cannot be blank!");GI("TxtEnDate").focus()}b=false}else{b=true}}return b}function OCRT(){var d=GI("NumRnTm").value;
+var c=parseInt(d);var b=GSS();var a=arrySt[b-1];if(VRT(d,true)){a.sRT=d}UL(b)}function OUC(){var a=null;var c=null;var d=0,b=0;if(VSD()){for(var d=0;d<8;
+d++){a=arrySt[d];b=d+1;c=GI("Station"+b.toString());if(c){c.value=a.sD+"#"+a.sSD+"#"+a.sED+"#"+a.nRF.toString()+"#"+a.nSF.toString()+"#"+a.sST+"#"+a.sET+
+"#"+a.sRT+"#"+a.nRnF.toString()}}GI("SelStation").disabled=true;GI("IrrigationForm").submit();GI("SelStation").disabled=false}}function OCRF(){var b=GSS
+();var a=arrySt[b-1];var c=GI("SelRnFreq");a.nRnF=c.selectedIndex;UL(b)}function OSFC(c){var b=GSS();var a=arrySt[b-1];var d=GI(c);a.nSF=d.selectedIndex;
+UL(b)}function OCSD(){var c=GSS();var a=arrySt[c-1];var b=GI("TxtStDate").value;if(VD(b,"Start date")){if(HY(b)){b=b.substring(0,b.lastIndexOf("/"))}a.
+sSD=b}}function OCED(){var c=GSS();var a=arrySt[c-1];var b=GI("TxtEnDate").value;if(VD(b,"End date")){if(HY(b)){b=b.substring(0,b.lastIndexOf("/"))}a.sED
+=b}}function HS(b){var a=b.indexOf(":");a=b.indexOf(":",a+1);return a>=0}function OCST(){var b=GSS();var a=arrySt[b-1];var c=GI("TimeStart").value;if(VT(
+c,"Start time")){if(HS(c)){c=strDate.substring(0,c.lastIndexOf(":"))}a.sST=c}UL(b)}function OCET(){var b=GSS();var a=arrySt[b-1];var c=GI("TimeEnd").
+value;if(VT(c,"End time")){if(HS(c)){c=strDate.substring(0,c.lastIndexOf(":"))}a.sET=c}UL(b)}function GDI(b,a){var c=0;if(b==1){switch(a){case 0:c=30;
+break;case 1:c=60;break;case 2:c=90;break;case 3:c=120;break}}else{if(b==2){switch(a){case 0:c=7;break;case 1:c=14;break;case 2:c=21;break}}else{if(b==3)
+{switch(a){case 0:c=1;break;case 1:c=2;break;case 2:c=3;break;case 3:c=4;break;case 4:c=5;break;case 5:c=6;break}}}}return c}function BuildProgList(f){if
+((f>=1)&&(f<=8)){var b=arrySt[f-1];E(b.arryD);if(b.arryT.length>0){var a="";var e=0,d=0;d=GDI(b.nRF,b.nSF);if(d>0){var c=null;for(e=1,c=GDFDOY(e);e<=365;
+e+=d,c=GDFDOY(e)){a=c.getDate()+"/"+(c.getMonth()+1)+"- "+GRT(b.arryT);b.arryD.push(a)}}}}}function RestList(d,e){var a=null;var c=GI(d);while(c.options.
+length>0){c.remove(0)}for(var b=0;b<e.length;b++){a=document.createElement("option");a.text=e[b];c.add(a)}}function GHI(a){switch(a){case 0:a=2;break;case
+ 1:a=3;break;case 2:a=4;break;case 3:a=6;break;case 4:a=8;break;case 5:a=12;break;case 6:a=24;break}return a}function BuildTimeList(f){if((f>=1)&&(f<=8)){
+var b=arrySt[f-1];E(b.arryT);if(b.sRT!="0"){var c="";var a=0;var d="";var h="";var j=0;var g=0;var i=GHI(b.nRnF);a=b.sST.indexOf(":");d=b.sST.substring(0,
+a);h=b.sST.substring(a,b.sST.length);("00"+h).slice(-2);j=parseInt(d);a=b.sET.indexOf(":");d=b.sET.substring(0,a);g=parseInt(d);if(g<=j){g+=24}if(i>0){var 
+e=j;while(j<=g){if(j>23){e=j-24}else{e=j}c=("00"+e.toString()).slice(-2)+h+"("+b.sRT+")";if(b.arryT.indexOf(c)==-1){b.arryT.push(c)}j+=i}}}}}function UL
+(b){var a=arrySt[b-1];BuildTimeList(b);BuildProgList(b);RestList("SelRnTms",a.arryT);RestList("SelDts",a.arryD);EUB()}function OCSO(){GI("NumRnTm").value
+="0";var b=GSS();var a=arrySt[b-1].sRT="0";UL(b)}</script><div style="visibility:visible"class="Blck"id="Main"><div style="margin-top:20px;margin-bottom:20px"
+class="Head"><strong><u>Greg's Irrigation Controller - Irrigation 1</u></strong></div><div style=margin-top:20px;margin-bottom:20px"class="Medium">The 
+ user manual can be found at: <a href="http://www.gregsindigenouslandscapes.com.au/UserManual.php">http://www.gregsindigenouslandscapes.com.au/UserManual.php
+</a></div><br><div class="Link"><a href="clock.htm"class="Large"><b>Go to system clock</b></a></div><div class="Link"><a href="walarms.htm"class="Large"><b>
+Go to wired soil moisture alarms</b></a></div><div class="Link"><a href="email.htm"class="Large"><b>Go to email settings</b></a></div><div class="Link"><a 
+href="manual.htm"class="Large"><b>Go to manual control</b></a></div>&nbsp;<form action="program.htm"method="GET"id="IrrigationForm"accept-charset="ASCII"
+class="BrdOuts"style="background-color:silver;width:60%"><div class="Head"style="color:blue;margin:10px 10px 10px 12px"><b>Irrigation programs</b></div>
+<fieldset><legend class="Large"style="width:121px"><strong>Select station</strong></legend><table style="width:100%;border-collapse:collapse"class=
+"BrdTp BrdBttm BrdLft BrdRght"><tr><td>&nbsp;</td></tr><tr><td class="Medium"valign="middle"align="right"style="width:89px">Settings for:</td><td valign=
+"middle"align="left"colspan="6"><select name="SelStation"id="SelStation"style="width:82px;height:22px"tabindex="1"onchange="OSC()"><option selected=
+"selected"value="1">Station 1</option><option value="2">Station 2</option><option value="3">Station 3</option><option value="4">Station 4</option><option 
+value="5">Station 5</option><option value="6">Station 6</option><option value="7">Station 7</option><option value="8">Station 8</option></select></td></tr>
+<tr><td>&nbsp;</td></tr></table></fieldset><br /><fieldset><legend style="width:180px"><input id="Desc"class="BrdIns"style="width:178px;height:18px"tabindex
+="2"type="text"placeholder="Station description"maxlength="24"onchange="OCD()"/></legend><table style=
+"width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif"><tr><td class="BrdTp BrdLft"valign="middle"style="height:56px;text-align:right"
+colspan="2">Suspend irrigation between:</td><td style="width:154px;height:56px"class="BrdTp BrdBttm BrdRght"valign="middle"><p><input id="TxtStDate"class=
+"BrdIns"style="width:150px;height:18px"tabindex="3"type="date"onchange="OCSD()"/></p><p><input id="TxtEnDate"class="BrdIns"style="width:150px;height:18px"
+tabindex="4"type="date"onchange="OCED()"/></p></td><td valign="middle"align="right"class="BrdTp"style="width:105px">Start:</td><td valign="middle"align=
+"left"class="BrdTp"><input id="TimeStart"size="4"class="BrdIns"style="width:80px;height:18px"tabindex="5"type="time"value="00:00"onchange="OCST()"/><br />
+</td><td valign="middle"align="left"class="BrdTp">End:</td><td valign="middle"align="left"class="BrdTp BrdRght"><input id="TimeEnd"size="4"class="BrdIns"
+style="width:80px;height:18px"tabindex="6"type="time"value="00:00"onchange="OCET()"/></td></tr><tr><td valign="middle"class="BrdTp BrdBttm BrdLft"style=
+"width:192px;height:56px"><input checked="checked"name="Frequency"type="radio"tabindex="7"value="1"id="RadFrqMn"onclick="ORF(1)"/>Monthly</td><td style=
+"width:66px;height:56px"class="BrdTp BrdBttm"valign="middle"align="right">Monthly:</td><td style="width:154px;height:56px"class="BrdTp BrdBttm BrdRght"
+valign="middle"><select class="BrdIns"style="width:156px"tabindex="8"id="SelMnFreq"onchange="OSFC('SelMnFreq')"><option selected="selected"value="1">Once 
+per month</option><option value="2">Every second month</option><option value="3">Every third month</option><option value="4">Every fourth month</option>
+</select></td><td valign="middle"align="right"style="width:105px">Run time:</td><td valign="middle"align="left"class="BrdRght"colspan="3"><input id=
+"NumRnTm"size="2"class="BrdIns"style="width:36px;height:20px"tabindex="9"type="number"value="0"min="0"max="30"onchange="OCRT()"/>&nbsp;minutes&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input name="StationOff"tabindex="20"type="button"value="Station off"onclick="OCSO()"/></td></tr><tr>
+<td style="width:192px;height:56px"class="BrdTp BrdBttm BrdLft"valign="middle"><input name="Frequency"type="radio"tabindex="10"value="2"id="RadFrqWk"onclick=
+"ORF(2)"/>Weekly</td><td style="width:66px;height:56px"class="BrdTp BrdBttm"valign="middle"align="right">Weekly:</td><td style="width:154px;height:56px"
+class="BrdTp BrdBttm BrdRght"valign="middle"><select class="BrdIns"style="width:156px"tabindex="11"id="SelWkFreq"disabled="disabled"onchange=
+"OSFC('SelWkFreq')"><option selected="selected"value="1">Once per week</option><option value="2">Every second week</option><option value="3">Every third week
+</option></select></td><td valign="middle"align="right"style="width:105px">Run every:</td><td valign="middle"align="left"class="BrdRght"colspan="3"><select id=
+"SelRnFreq"style="width:159px"tabindex="12"onchange="OCRF()"><option value="2">2 hours</option><option value="3">3 hours</option><option value="4">4 hours
+</option><option value="6">6 hours</option><option value="8">8 hours</option><option value="12">12 hours</option><option selected="selected"value="24">24 hours
+</option></select></td></tr><tr><td style="width:192px;height:56px"class="BrdTp BrdBttm BrdLft"valign="middle"><input name="Frequency"type="radio"tabindex="13"
+value="3"id="RadFrqDaily"onclick="ORF(3)"/>Daily</td><td style="width:66px;height:56px"class="BrdTp BrdBttm"valign="middle"align="right">Daily:</td><td style=
+"width:154px;height:56px"class="BrdTp BrdBttm BrdRght"valign="middle"><select class="BrdIns"style="width:156px;height:22px"tabindex="14"id="SelDyFreq"disabled
+="disabled"onchange="OSFC('SelDyFreq')"><option selected="selected"value="1">Every day</option><option value="2">Every second day</option><option value="3">
+Every third day</option><option value="4">Every fourth day</option><option value="5">Every fifth day</option><option value="6">Every sixth day</option>
+</select></td><td valign="middle"align="right"style="width:66px;height:56px"class="BrdBttm">Run times:</td><td valign="middle"align="left"colspan="3"style=
+"width:154px;height:56px"class="BrdRght BrdBttm"><select size="20"id="SelRnTms"disabled="disabled"class="BrdIns"style="margin:5px;height:100px;width:60%"
+tabindex="15"></select></td></tr><tr><td style="height:40px"class="BrdBttm BrdLft BrdRght"valign="middle"colspan="7"><select disabled="disabled"size="20"id=
+"SelDts"class="BrdIns"style="margin:5px;height:100px;width:98%;overflow:scroll"tabindex="16"></select></td></tr></table></fieldset><fieldset><legend class=
+"Large"style="width:63px"><strong>Upload</strong></legend><table style="width:100%;border:3px ridge silver"><tr><td valign="middle"align="center"class="Medium">
+<input id="ButtonUpload"type="button"class="BrdOuts"style="width:250px"value="Upload program to irrigation controller"tabindex="17"disabled="disabled"onclick=
+"OUC()"/>&nbsp;&nbsp;&nbsp;&nbsp;</td></tr><tr><td valign="middle"align="left"class="Medium Font"style="color:teal">Program not uploaded yet...</td></tr></table>
+</fieldset><input name="Station1"id="Station1"type="hidden"/><input name="Station2"id="Station2"type="hidden"/><input name="Station3"id="Station3"type="hidden"/>
+<input name="Station4"id="Station4"type="hidden"/><input name="Station5"id="Station5"type="hidden"/><input name="Station6"id="Station6"type="hidden"/><input 
+name="Station7"id="Station7"type="hidden"/><input name="Station8"id="Station8"type="hidden"/></form></div></body><footer><script type="text/javascript">
+GI("Message").style.display="none";GI("Main").style.visibility="visible";function OnLoad(){R(1);for(var b=1;b<=8;b++){BuildTimeList(b);BuildProgList(b)}var a=
+arrySt[0];RestList("SelRnTms",a.arryT);RestList("SelDts",a.arryD);DoEnable(true)}function DoEnable(){var b=0;var c;var d=null;GI("SelStation").disabled=false;
+GI("SelStation").selectedIndex=0;GI("Desc").disabled=false;GI("TxtStDate").disabled=false;GI("TxtEnDate").disabled=false;GI("RadFrqMn").disabled=false;GI(
+"RadFrqMn").checked=true;GI("SelMnFreq").disabled=false;GI("RadFrqWk").disabled=false;GI("RadFrqWk").checked=false;GI("RadFrqDaily").disabled=false;GI(
+"RadFrqDaily").disabled=false;GI("TimeStart").disabled=false;GI("TimeEnd").disabled=false;GI("NumRnTm").disabled=false;GI("SelRnFreq").disabled=false;GI(
+"SelRnTms").disabled=false;GI("SelDts").disabled=false;var a=arrySt[0];ESF(a.nRF);SRF(a.nRF);EUB()};</script></footer></html>

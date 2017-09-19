@@ -1,0 +1,973 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta content="en-au" http-equiv="Content-Language" />
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+		<title>Irrigation Settings</title>
+		<style type="text/css">
+			.Link
+			{
+				background-color:olive;
+				width:300px;
+				height:25px;
+				vertical-align:middle;
+				text-align:center;
+				border-radius:5px;
+				border: 2px solid olive;
+				margin-bottom:10px;	
+			}
+			.Font
+			{
+				font-family:Arial,Helvetica,sans-serif
+			}
+			.Blck
+			{
+				color:black
+			}
+			.Red
+			{
+				color:red
+			}
+			.Head
+			{
+				font-size:xx-large
+			}
+			.Large
+			{
+				font-size:large
+			}
+			.Medium
+			{
+				font-size:medium
+			}
+			.Small
+			{
+				font-size:small
+			}
+			.BrdIns
+			{
+				border:2px inset silver;
+				border-radius:3px;
+			}
+			.BrdOuts
+			{
+				border:2px outset silver;
+				border-radius:3px;
+			}
+			.BrdBttm
+			{
+				border-bottom:3px ridge silver
+			}
+			.BrdTp
+			{
+				border-top:3px ridge silver
+			}
+			.BrdLft
+			{
+				border-left:3px ridge silver
+			}
+			.BrdRght
+			{
+				border-right:3px ridge silver
+			}
+			.Teal
+			{
+				background:teal;
+			}
+						
+		</style>
+		
+	</head>
+	
+	<body class="Teal Font" onload="OnLoad()">
+		
+		<span id="Message" class="Head Red"><strong><br />Please be patient while the web page downloads from the irrigation controller...</strong></span>
+		
+		<script type="text/javascript">
+			
+			var arrayStat = new Array();
+			
+			function structStat(strDesc, nRadFrq, nSelFrq, strStartDate, strEndDate, arrayDates, strStartTime, strEndTime, strRuntime, nRunFreq, arrayTimes)
+			{
+				this.strDesc = strDesc;
+				this.nRadFrq = nRadFrq;
+				this.nSelFrq = nSelFrq;
+				this.strStartDate = strStartDate;
+				this.strEndDate = strEndDate;
+				this.strStartTime  = strStartTime;
+				this.strEndTime = strEndTime;
+				this.strRuntime = strRuntime;
+				this.nRunFreq = nRunFreq;
+				this.arrayDates = arrayDates;
+				this.arrayTimes = arrayTimes;
+			}
+			/*
+			arrayStat.push(new structStat("desc", radfreq, selfreq, "startdate", "enddate", new Array(), "starttime", "endtime", "runtime", runfreq, new Array()));
+			arrayStat.push(new structStat("desc", radfreq, selfreq, "startdate", "enddate", new Array(), "starttime", "endtime", "runtime", runfreq, new Array()));
+    		arrayStat.push(new structStat("desc", radfreq, selfreq, "startdate", "enddate", new Array(), "starttime", "endtime", "runtime", runfreq, new Array()));
+			arrayStat.push(new structStat("desc", radfreq, selfreq, "startdate", "enddate", new Array(), "starttime", "endtime", "runtime", runfreq, new Array()));
+			arrayStat.push(new structStat("desc", radfreq, selfreq, "startdate", "enddate", new Array(), "starttime", "endtime", "runtime", runfreq, new Array()));
+			arrayStat.push(new structStat("desc", radfreq, selfreq, "startdate", "enddate", new Array(), "starttime", "endtime", "runtime", runfreq, new Array()));
+			arrayStat.push(new structStat("desc", radfreq, selfreq, "startdate", "enddate", new Array(), "starttime", "endtime", "runtime", runfreq, new Array()));
+			arrayStat.push(new structStat("desc", radfreq, selfreq, "startdate", "enddate", new Array(), "starttime", "endtime", "runtime", runfreq, new Array()));
+			*/
+arrayStat.push(new structStat("Succulents",2,0,"1/5","1/9",new Array(),"00:00","00:00","1",0,new Array()));
+arrayStat.push(new structStat("Tomatoes",3,5,"2/5","2/9",new Array(),"23:00","23:00","2",1,new Array()));
+arrayStat.push(new structStat("Carrots",3,4,"3/5","3/9",new Array(),"22:00","22:00","3",2,new Array()));
+arrayStat.push(new structStat("Peas",3,3,"4/5","4/9",new Array(),"21:00","21:00","4",3,new Array()));
+arrayStat.push(new structStat("Natives 5",1,0,"","",new Array(),"00:00","00:00","0",0,new Array()));
+arrayStat.push(new structStat("Station 6",1,0,"","",new Array(),"00:00","00:00","0",0,new Array()));
+arrayStat.push(new structStat("Station 7",1,0,"","",new Array(),"00:00","00:00","0",0,new Array()));
+arrayStat.push(new structStat("Station 8",1,0,"","",new Array(),"00:00","00:00","0",0,new Array()));
+			
+			function GI(strID)
+			{
+				var input = document.getElementById(strID);
+				
+				if (!input)
+					alert("Input with ID '" + strID + "!");
+					
+				return input;
+			}
+		
+			function ValRuntime(strMin, bDisplayMsg)
+			{
+				var bRes = true;
+				var	nMin = Number(strMin);
+
+				if ((strMin.length  ==  0) && bDisplayMsg)
+				{
+					alert("'Run time' must be between 0 and 30 minutes!");
+					bRes = false;
+				}
+				else
+				{
+
+					bRes = nMin  != NaN;
+					bRes &= nMin >= 0;
+					bRes &= nMin <= 30;
+
+					if (!bRes && bDisplayMsg)
+						alert("'Run time' must be between 0 and 30 minutes!");
+				}
+				return bRes;
+			}
+			
+			function ValTime(strTime, strName)
+			{
+				var bRes = true;
+				var nPos = 0;
+				var strMsg = "";
+				var strHr = "";
+				var strMin = "";
+
+				if ((strTime.length  ==  0) && (strName != null))
+				{
+					alert(strName + " cannot be blank!");
+					bRes = false;
+				}
+				else
+				{
+					nPos = strTime.indexOf(":");
+					if (nPos  ==  -1)
+					{
+						bRes = false
+					}
+					else
+					{
+						strHr = strTime.substring(0, nPos);
+						strMin = strTime.substring(nPos + 1, strTime.length);
+						bRes = (Number(strHr) != NaN) && (Number(strMin) != NaN) && (Number(strHr) >= 0) && (Number(strHr) <= 23) && (Number(strMin) >= 0) && (Number(strMin) <= 59);
+					}
+					if (!bRes && (strName != null))
+					{
+						strMsg = "'";
+						strMsg += strTime + "' is not a valid time!";
+						alert(strMsg)
+					}
+				}
+				return bRes
+			}
+		
+			function OnChngDesc()
+			{
+				var StatDet = arrayStat[GetSelStat() - 1];
+				StatDet.strDesc = GI("Desc").value;
+			}
+			
+			function GetSelStat()
+			{
+				var SelStation = GI("SelStation");	
+				return SelStation.options[SelStation.selectedIndex].value
+			}
+		
+			function SetRadFrq(nRadFrq)
+			{
+				GI("RadFrqMn").checked = false;
+				GI("RadFrqWk").checked = false;
+				GI("RadFrqDaily").checked = false;
+				
+				switch (nRadFrq)
+				{
+					case 1: GI("RadFrqMn").checked = true; break;
+					case 2: GI("RadFrqWk").checked = true; break;
+					case 3: GI("RadFrqDaily").checked = true; break;
+					default: GI("RadFrqMn").checked = true;
+				}
+			}
+
+			function SetSelFreq(nRadFrq, nSelFrq)
+			{
+				switch (nRadFrq)
+				{
+					case 1: GI("SelMnFreq").selectedIndex = nSelFrq; break;
+					case 2: GI("SelWkFreq").selectedIndex = nSelFrq; break;
+					case 3: GI("SelDyFreq").selectedIndex = nSelFrq; break;
+				}
+			}
+			
+			function EnUploadBttn()
+			{
+				var bEn = false;
+				
+				for (var nI = 0; nI < 8; nI++)
+				{
+					bEn |= arrayStat[nI].arrayDates.length > 0;
+					if (bEn)
+						break;
+				}
+				GI("ButtonUpload").disabled = !bEn;
+			}
+			
+			function GetDateFromDOY(nDOY)
+			{
+ 		 		var dateCurrent = new Date(new Date().getFullYear(), 0);
+ 		 		dateCurrent = new Date(dateCurrent.setDate(nDOY));
+
+  				return dateCurrent;
+			}
+
+			function GetRuntimes(arrayTimes)
+			{
+				var strRuntimes = "";
+
+				for (var nI = 0; nI < arrayTimes.length; nI++)
+				{
+					strRuntimes += arrayTimes[nI];
+					if (nI < (arrayTimes.length  -1))
+						strRuntimes += ", ";
+				}
+				return strRuntimes;
+			}
+			
+			function EnSelFreq(nRadFrq)
+			{
+				var bEnSelFreqMonth = false;
+				var bEnSelFreqWeek = false;
+				var bEnSelFreqDay = false;
+
+				switch (nRadFrq)
+				{
+					case 1: bEnSelFreqMonth = true; break;
+					case 2: bEnSelFreqWeek = true; break;
+					case 3: bEnSelFreqDay = true; break;
+					default: bEnSelFreqMonth = true;
+				}
+				GI("SelMnFreq").disabled = !bEnSelFreqMonth;				
+				GI("SelWkFreq").disabled = !bEnSelFreqWeek;
+				GI("SelDyFreq").disabled = !bEnSelFreqDay;
+			}
+			
+			function OnRadFreq(nRadFrq)
+			{
+				var nStationNum = GetSelStat();
+				var StatDet = arrayStat[nStationNum - 1];
+
+				EnSelFreq(nRadFrq);
+				if (StatDet.nRadFrq != nRadFrq)
+				{
+					StatDet.nRadFrq = nRadFrq;
+					StatDet.nSelFrq = 1;
+					UpdateLists(nStationNum);
+				}
+			}
+			
+			function HasYear(strDate)
+			{
+				var nPos = strDate.indexOf("/");
+				
+				nPos = strDate.indexOf("/", nPos + 1);
+				
+				return nPos >= 0;
+			}
+			
+			function Empty(array)
+			{
+				while (array.length > 0)
+					array.pop();
+			}
+			
+			function Restore(nStationNum)
+			{
+				
+				if ((nStationNum >= 1) && (nStationNum <= 8))
+				{
+					var StatDet = arrayStat[nStationNum - 1];
+
+					GI("Desc").value = StatDet.strDesc;
+	
+					if ((StatDet.nRadFrq >=  1) && (StatDet.nRadFrq <= 3))
+						SetRadFrq(StatDet.nRadFrq);
+					else
+						SetRadFrq(1);
+				
+					if (((StatDet.nRadFrq == 1) && (StatDet.nSelFrq >= 0) && (StatDet.nSelFrq <= 3)) ||
+						((StatDet.nRadFrq == 2) && (StatDet.nSelFrq >= 0) && (StatDet.nSelFrq <= 2)) ||
+						((StatDet.nRadFrq == 3) && (StatDet.nSelFrq >= 0) && (StatDet.nSelFrq <= 5)))
+						SetSelFreq(StatDet.nRadFrq, StatDet.nSelFrq);
+					else
+						SetSelFreq(1, 0);
+
+					if (ValDate(StatDet.strStartDate, null))
+						GI("TxtStDate").value = StatDet.strStartDate;
+					else
+						GI("TxtStDate").value = "";
+						
+					if (ValDate(StatDet.strEndDate, null))
+						GI("TxtEnDate").value = StatDet.strEndDate;
+					else
+						GI("TxtEnDate").value = "";
+
+					if (ValTime(StatDet.strStartTime, null))
+						GI("TimeStart").value = StatDet.strStartTime;
+					else
+						GI("TimeStart").value = "00:00";
+
+					if (ValTime(StatDet.strEndTime, null))
+						GI("TimeEnd").value = StatDet.strEndTime;
+					else
+						GI("TimeEnd").value = "00:00";
+					
+					if (ValRuntime(StatDet.strRuntime, null))
+						GI("NumRnTm").value = StatDet.strRuntime;
+					else
+						GI("NumRnTm").value = "0";
+					
+					if ((StatDet.nRunFreq >= 0) && (StatDet.nRunFreq <= 6))
+						GI("SelRnFreq").selectedIndex = StatDet.nRunFreq;
+					else
+						GI("SelRnFreq").selectedIndex = 0;
+					RestList("SelRnTms", StatDet.arrayTimes);
+					RestList("SelDts", StatDet.arrayDates);
+				}
+				else
+					alert("Restore(nStation) - nStation out of range!");
+			}
+			
+			function OnStationChange()
+			{
+				var SelStat = GI("SelStation");
+				var nStation = SelStat.options[SelStat.selectedIndex].value;
+				var StatDet = arrayStat[nStation - 1];
+				Restore(nStation);
+				OnRadFreq(StatDet.nRadFrq);
+			}
+						
+			function ValDate(strDate, strName)
+			{
+				var bRes = false;
+				var nPos1 = 0, nPos2 = 0;
+				var nDOM = 0, nMonth = 0;
+				var str = "";
+			
+				nPos1 = strDate.indexOf("/");
+				if (nPos1 >= 0)
+				{
+					str = strDate.substring(0, nPos1);
+					nDOM = Number(str);
+				}
+				nPos2 = strDate.indexOf("/", nPos1 + 1);
+				if (nPos2 >= 0)
+				{
+					str = strDate.substring(nPos1 + 1, nPos2); 
+					nMonth = Number(str);
+				}
+				else
+				{
+					str = strDate.substring(nPos1 + 1, strDate.length);
+					nMonth = Number(str);
+				}	
+				bRes = (nMonth >= 1) && (nMonth <= 12) && (nDOM >= 1) && (nDOM <= 28);
+				
+				if (!bRes && (strName != null))
+					alert(strName + "(" + strDate + ") is not a valid date!");
+		
+				return bRes;
+			}
+			
+			function ValSuspDates()
+			{
+				var bRes = false;
+				var strStartDate = GI("TxtStDate").value, 
+					strEndDate = GI("TxtEnDate").value;
+				var nStartSec = Date.parse(strStartDate),
+					nEndSec = Date.parse(strEndDate);
+				
+				if ((strStartDate.length == 0) && (strEndDate.length > 0))
+				{
+					if (isNaN(nEndSec))
+					{
+						alert("Valid full date required for suspend end date!");
+						GI("TxtEnDate").focus();
+					}
+					else
+					{
+						alert("Suspend start date cannot be blank!");
+						GI("TxtStDate").focus();
+					}
+					bRes = false;
+				}
+				else if ((strStartDate.length > 0) && (strEndDate.length == 0))
+				{
+					if (isNaN(nStartSec))
+					{
+						alert("Valid full date required for suspend start date!");
+						GI("TxtStDate").focus();
+					}
+					else
+					{
+						alert("Suspend end date cannot be blank!");
+						GI("TxtEnDate").focus();
+					}
+					bRes = false;
+				}
+				else
+					bRes = true;
+					
+				return bRes;
+			}
+
+			function OnChngRntm()
+			{
+				var strRuntime = GI("NumRnTm").value;
+				var nRuntime = parseInt(strRuntime);
+				var nStation = GetSelStat();
+				var StatDet = arrayStat[nStation - 1];
+
+				if (ValRuntime(strRuntime, true))
+					StatDet.strRuntime = strRuntime;					
+				UpdateLists(nStation);
+			}
+			
+			function OnUploadClick()
+			{
+				var StatDet = null;
+				var hiddenStation = null;
+				var nNum = 0, nStationNum = 0;
+				
+				if (ValSuspDates())
+				{
+					for (var nNum = 0; nNum < 8; nNum ++)
+					{
+						StatDet = arrayStat[nNum];
+						nStationNum = nNum + 1;
+						hiddenStation = GI("Station" + nStationNum.toString());
+			
+						if (hiddenStation)
+						{
+							hiddenStation.value = StatDet.strDesc + "#" + StatDet.strStartDate + "#" + StatDet.strEndDate + 
+													"#" + StatDet.nRadFrq.toString() + "#" + StatDet.nSelFrq.toString()  + 
+													"#" + StatDet.strStartTime + "#" + StatDet.strEndTime + "#" + StatDet.strRuntime + 
+													"#" + StatDet.nRunFreq.toString();
+						}
+					}
+					GI("SelStation").disabled = true;
+					GI("IrrigationForm").submit();
+					GI("SelStation").disabled = false;
+				}
+			}
+			
+			function OnChngRunFreq()
+			{
+				var nStation = GetSelStat();
+				var StatDet = arrayStat[nStation - 1];
+				var Select = GI("SelRnFreq");
+				StatDet.nRunFreq = Select.selectedIndex;
+				UpdateLists(nStation);
+			}
+			
+			function OnSelFreqChng(strSelectID)
+			{
+				var nStation = GetSelStat();
+				var StatDet = arrayStat[nStation - 1];
+				var Select = GI(strSelectID);
+				
+				
+				StatDet.nSelFrq = Select.selectedIndex;
+				UpdateLists(nStation);
+			}
+			
+			function OnChngStDte()
+			{
+				var nStation = GetSelStat();
+				var StatDet = arrayStat[nStation - 1];
+				var strDate = GI("TxtStDate").value;
+				
+				if (ValDate(strDate , "Start date"))
+				{
+					if (HasYear(strDate))
+						strDate = strDate.substring(0, strDate.lastIndexOf("/"));
+					StatDet.strStartDate = strDate;
+				}
+			}
+			
+			function OnChngEnDte()
+			{
+				var nStation = GetSelStat();
+				var StatDet = arrayStat[nStation - 1];
+				var strDate = GI("TxtEnDate").value;
+
+				if (ValDate(strDate, "End date"))
+				{
+					if (HasYear(strDate))
+						strDate = strDate.substring(0, strDate.lastIndexOf("/"));
+					StatDet.strEndDate = strDate;
+				}
+			}
+			
+			function HasSeconds(strTime)
+			{
+				var nPos = strTime.indexOf(":");
+				nPos = strTime.indexOf(":", nPos + 1);
+				return nPos >= 0;
+			}
+			
+			function OnChngStTme()
+			{
+				var nStation = GetSelStat();
+				var StatDet = arrayStat[nStation - 1];
+				var strTime = GI("TimeStart").value;
+				if (ValTime(strTime, "Start time"))
+				{
+					if (HasSeconds(strTime))
+						strTime = strDate.substring(0, strTime.lastIndexOf(":"));
+					StatDet.strStartTime = strTime;
+				}
+				UpdateLists(nStation);
+			}
+			
+			function OnChngEnTme()
+			{
+				var nStation = GetSelStat();
+				var StatDet = arrayStat[nStation - 1];
+				var strTime = GI("TimeEnd").value;
+				
+				if (ValTime(strTime, "End time"))
+				{
+					if (HasSeconds(strTime))
+						strTime = strDate.substring(0, strTime.lastIndexOf(":"));
+					StatDet.strEndTime = strTime;
+				}
+				UpdateLists(nStation);
+			}
+
+			function GetDyInt(nRadFrq, nSelectFreq)
+			{
+				var nDayInterval = 0;
+				
+				if (nRadFrq == 1)
+				{
+					switch (nSelectFreq)
+					{
+						case 0: nDayInterval = 30; break;
+						case 1: nDayInterval = 60; break;
+						case 2: nDayInterval = 90; break;
+						case 3: nDayInterval = 120; break;
+					}
+				}
+				else if (nRadFrq == 2)
+				{
+					switch (nSelectFreq)
+					{
+						case 0: nDayInterval = 7; break;
+						case 1: nDayInterval = 14; break;
+						case 2: nDayInterval = 21; break;
+					}
+				}
+				else if (nRadFrq == 3)
+				{
+					switch (nSelectFreq)
+					{
+						case 0: nDayInterval = 1; break;
+						case 1: nDayInterval = 2; break;
+						case 2: nDayInterval = 3; break;
+						case 3: nDayInterval = 4; break;
+						case 4: nDayInterval = 5; break;
+						case 5: nDayInterval = 6; break;
+					}						
+				}
+				return nDayInterval;
+			}
+			
+			function BuildProgList(nStation)
+			{
+				if ((nStation >= 1) && (nStation <= 8))
+				{
+					var StatDet = arrayStat[nStation - 1];
+					Empty(StatDet.arrayDates);
+					
+					if (StatDet.arrayTimes.length > 0)
+					{
+						var strText = "";
+						var nI = 0, nIrrigFreq = 0;
+		
+						nIrrigFreq = GetDyInt(StatDet.nRadFrq, StatDet.nSelFrq);	
+						if (nIrrigFreq > 0)
+						{
+							var date = null;
+		
+							for (nI = 1, date = GetDateFromDOY(nI); nI <= 365; nI += nIrrigFreq, date = GetDateFromDOY(nI))
+							{
+								strText = date.getDate() + "/" + (date.getMonth() + 1) + " - " + GetRuntimes(StatDet.arrayTimes);
+								StatDet.arrayDates.push(strText);
+							}
+						}
+						else
+							alert("BuildProgList(nStation) - nIrrigFreq == 0");
+					}
+				}
+				else
+					alert("BuildProgList(nStation) - nStation out of range!");
+			}
+			
+			function RestList(strID, array)
+			{
+				var Opt = null;
+				var List = GI(strID);
+				
+                while (List.options.length > 0)
+                	List.remove(0);
+
+				for (var nI = 0; nI < array.length; nI++)
+				{
+					Opt = document.createElement("option");
+					Opt.text = array[nI];
+					List.add(Opt);					
+				}
+			}
+			
+			function GetHrInt(nRunFreq)
+			{
+				switch (nRunFreq)
+				{
+					case 0: nRunFreq = 2; break;
+					case 1: nRunFreq = 3; break;
+					case 2: nRunFreq = 4; break;
+					case 3: nRunFreq = 6; break;
+					case 4: nRunFreq = 8; break;
+					case 5: nRunFreq = 12; break;
+					case 6: nRunFreq = 24; break;
+				}
+				return nRunFreq;
+			}
+			
+			function BuildTimeList(nStation)
+			{
+				if ((nStation >= 1) && (nStation <= 8))
+				{
+					var StatDet = arrayStat[nStation - 1];
+					Empty(StatDet.arrayTimes);
+
+					if (StatDet.strRuntime != "0")
+					{
+						var strText = "";
+						var nPos = 0;
+						var strHr = "";
+						var strMin = "";
+						var nStartHr = 0;
+						var nEndHr = 0;
+						var nFreq = GetHrInt(StatDet.nRunFreq);
+
+						nPos = StatDet.strStartTime.indexOf(":");
+						strHr = StatDet.strStartTime.substring(0, nPos);
+						strMin = StatDet.strStartTime.substring(nPos, StatDet.strStartTime.length);
+						("00" + strMin).slice(-2);
+						nStartHr = parseInt(strHr);
+						nPos = StatDet.strEndTime.indexOf(":");
+						strHr = StatDet.strEndTime.substring(0, nPos);
+						nEndHr = parseInt(strHr);
+						
+						if (nEndHr <= nStartHr)
+							nEndHr += 24;
+
+						if (nFreq > 0)
+						{
+							var nI = nStartHr;
+							while (nStartHr <= nEndHr)
+							{
+
+								if (nStartHr > 23)
+									nI = nStartHr - 24;
+								else
+									nI = nStartHr;
+								strText = ("00" + nI.toString()).slice(-2) + strMin + "(" + StatDet.strRuntime + ")";
+								if (StatDet.arrayTimes.indexOf(strText) == -1)
+									StatDet.arrayTimes.push(strText);
+								nStartHr += nFreq;
+							}
+						}
+						else
+							alert("ERROR: nFreq = 0");
+					}
+				}
+				else
+					alert("BuildTimeList(nStation) - nStation out of range!");
+			}
+			
+			function UpdateLists(nStation)
+			{
+				var StatDet = arrayStat[nStation - 1];
+				BuildTimeList(nStation);
+				BuildProgList(nStation);
+				RestList("SelRnTms", StatDet.arrayTimes);
+				RestList("SelDts", StatDet.arrayDates);
+				EnUploadBttn();
+			}
+			
+			function OnClckStatOff()
+			{
+				GI('NumRnTm').value = "0";
+				var nStation = GetSelStat();
+				var StatDet = arrayStat[nStation - 1].strRuntime = "0";
+				UpdateLists(nStation);
+			}
+			
+		</script>
+		
+		<div style="visibility:visible;" class="Blck" id="Main">
+		
+		
+			<div style="margin-top:20px;margin-bottom:20px" class="Head"><strong><u>Greg's Irrigation Controller - Irrigation 1</u></strong></div>
+
+			<div style="margin-top:20px;margin-bottom:20px" class="Medium">The user manual can be found at: <a href="http://www.gregsindigenouslandscapes.com.au/UserManual.php">http://www.gregsindigenouslandscapes.com.au/UserManual.php</a></div>
+
+			<br />
+			<div class="Link">
+				<a href="clock.htm" class="Large"><b>Go to system clock</b></a>
+			</div>
+			<div class="Link">
+				<a href="walarms.htm" class="Large"><b>Go to wired soil moisture alarms</b></a>
+			</div>
+			<div class="Link">
+				<a href="email.htm" class="Large"><b>Go to email settings</b></a>
+			</div>
+			<div class="Link">
+				<a href="manual.htm" class="Large"><b>Go to manual control</b></a>
+			</div>
+				&nbsp;<form action="program.htm" method="GET" id="IrrigationForm"  accept-charset="ASCII" class="BrdOuts" style="background-color:silver;width:60%">
+						<div class="Head" style="color:blue;margin:10px 10px 10px 12px"><b>Irrigation programs</b></div>
+						<fieldset>
+							<legend class="Large" style="width:121px"><strong>Select station</strong></legend>
+							<table style="width:100%;border-collapse:collapse;" class="BrdTp BrdBttm BrdLft BrdRght">
+								<tr><td>&nbsp;</td></tr>
+								<tr>
+									
+									<td class="Medium" valign="middle" align="right" style="width: 89px">
+										Settings for:</td>
+									<td valign="middle" align="left" colspan="6">
+										<select name="SelStation" id="SelStation" style="width: 82px; height: 22px;" tabindex="1" onchange="OnStationChange()">
+											<option selected="selected" value="1">Station 1
+											</option>
+											<option value="2">Station 2</option>
+											<option value="3">Station 3</option>
+											<option value="4">Station 4</option>
+											<option value="5">Station 5</option>
+											<option value="6">Station 6</option>
+											<option value="7">Station 7</option>
+											<option value="8">Station 8</option>
+										</select>
+									</td>
+								</tr>
+								<tr><td>&nbsp;</td></tr>
+							</table>
+						</fieldset><br />
+						<fieldset>
+							<legend style="width:180px">
+							<input id="Desc" class="BrdIns" style="width:178px; height:18px" tabindex="2" type="text" placeholder="Station description" maxlength="24" onchange="OnChngDesc()"/></legend>
+							<table style="width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif">
+								<tr>
+									<td class="BrdTp BrdLft" valign="middle" style="height:56px;text-align: right;" colspan="2">
+										Suspend irrigation between:
+									</td>
+									<td style="width:154px; height:56px" class="BrdTp BrdBttm BrdRght" valign="middle">
+										<p>
+											<input id="TxtStDate" class="BrdIns" style="width:150px;height:18px" tabindex="3" type="date" onchange="OnChngStDte()" />
+										</p>
+										<p>
+											<input id="TxtEnDate" class="BrdIns" style="width:150px;height:18px" tabindex="4" type="date"  onchange="OnChngEnDte()" />
+										</p>
+									</td>
+									<td valign="middle" align="right" class="BrdTp" style="width: 105px">Start:</td>
+									<td valign="middle" align="left" class="BrdTp" >
+										<input id="TimeStart" size="4" class="BrdIns" style="width:80px; height:18px" tabindex="5" type="time" value="00:00" onchange="OnChngStTme()" /><br />
+									</td>
+									<td valign="middle" align="left" class="BrdTp" >
+										End:</td>
+									<td valign="middle" align="left" class="BrdTp BrdRght" >
+										<input id="TimeEnd" size="4" class="BrdIns" style="width:80px; height:18px" tabindex="6" type="time" value="00:00" onchange="OnChngEnTme()"/>
+									</td>
+								</tr>
+								<tr>
+									<td valign="middle" class="BrdTp BrdBttm BrdLft" style="width:192px; height:56px">
+										<input checked="checked" name="Frequency" type="radio" tabindex="7" value="1" id="RadFrqMn" onclick="OnRadFreq(1)" />Monthly
+									</td>
+									<td style="width:66px;height:56px" class="BrdTp BrdBttm" valign="middle" align="right">Monthly:</td>
+									<td style="width:154px; height:56px" class="BrdTp BrdBttm BrdRght" valign="middle">
+										<select class="BrdIns" style="width:156px" tabindex="8" id="SelMnFreq" onchange="OnSelFreqChng('SelMnFreq')">
+											<option selected="selected" value="1">Once per month</option>
+											<option value="2">Every second month</option>
+											<option value="3">Every third month</option>
+											<option value="4">Every fourth month</option>
+										</select>
+									</td>
+									<td valign="middle" align="right" style="width: 105px" >
+										Run time:
+									</td>
+									<td valign="middle" align="left" class="BrdRght" colspan="3">
+										<input id="NumRnTm" size="2" class="BrdIns" style="width:36px; height:20px" tabindex="9" type="number" value="0" min="0" max="30" onchange="OnChngRntm()"/>&nbsp;minutes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										<input name="StationOff" tabindex="20" type="button" value="Station off" onclick="OnClckStatOff()"/></td>
+								</tr>
+								<tr>
+									<td style="width:192px; height:56px" class="BrdTp BrdBttm BrdLft" valign="middle">
+										<input name="Frequency" type="radio" tabindex="10" value="2" id="RadFrqWk" onclick="OnRadFreq(2)" />Weekly
+									</td>
+									<td style="width:66px;height:56px" class="BrdTp BrdBttm" valign="middle" align="right">Weekly:</td>
+									<td style="width:154px; height:56px" class="BrdTp BrdBttm BrdRght" valign="middle">
+										<select class="BrdIns" style="width:156px" tabindex="11" id="SelWkFreq" disabled="disabled" onchange="OnSelFreqChng('SelWkFreq')">
+											<option selected="selected" value="1">Once per week</option>
+											<option value="2">Every second week</option>
+											<option value="3">Every third week</option>
+										</select>
+									</td>
+									<td valign="middle" align="right" style="width: 105px" >
+										Run every:
+									</td>
+									<td valign="middle" align="left" class="BrdRght" colspan="3">
+										<select id="SelRnFreq" style="width: 159px" tabindex="12" onchange="OnChngRunFreq()">
+											<option value="2">2 hours</option>
+											<option value="3">3 hours</option>
+											<option value="4">4 hours</option>
+											<option value="6">6 hours</option>
+											<option value="8">8 hours</option>
+											<option value="12">12 hours</option>
+											<option selected="selected" value="24">24 hours</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td style="width:192px; height:56px" class="BrdTp BrdBttm BrdLft" valign="middle">
+										<input name="Frequency" type="radio" tabindex="13" value="3" id="RadFrqDaily" onclick="OnRadFreq(3)" />Daily
+									</td>
+									<td style="width:66px;height:56px" class="BrdTp BrdBttm" valign="middle" align="right">Daily:</td>
+									<td style="width:154px; height:56px" class="BrdTp BrdBttm BrdRght" valign="middle">
+										<select class="BrdIns" style="width:156px; height: 22px;" tabindex="14" id="SelDyFreq" disabled="disabled" onchange="OnSelFreqChng('SelDyFreq')">
+											<option selected="selected" value="1">Every day</option>
+											<option value="2">Every second day</option>
+											<option value="3">Every third day</option>
+											<option value="4">Every fourth day</option>
+											<option value="5">Every fifth day</option>
+											<option value="6">Every sixth day</option>
+										</select>
+									</td>
+									<td valign="middle" align="right" style="width:66px;height:56px" class="BrdBttm">
+										Run times:</td>
+									<td valign="middle" align="left" colspan="3" style="width:154px; height:56px" class="BrdRght BrdBttm">
+										<select size="20" id="SelRnTms" disabled="disabled" class="BrdIns" style="margin:5px;height:100px;width:60%" tabindex="15">
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td style="height:40px" class="BrdBttm BrdLft BrdRght" valign="middle" colspan="7">
+										<select disabled="disabled" size="20" id="SelDts" class="BrdIns" style="margin:5px;height:100px;width:98%;overflow:scroll;" tabindex="16">
+										</select>
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+						<fieldset>
+							<legend class="Large" style="width:63px"><strong>Upload</strong></legend>
+							<table style="width:100%;border:3px ridge silver">
+								<tr>
+									<td valign="middle" align="center" class="Medium">
+										<input id="ButtonUpload" type="button" class="BrdOuts" style="width:250px" value="Upload program to irrigation controller" tabindex="17" disabled="disabled" onclick="OnUploadClick()" />&nbsp;&nbsp;&nbsp;&nbsp;
+									</td>
+								</tr>
+								<tr>
+							<td valign="middle" align="left" class="Medium Font" style="color:teal">Program not uploaded yet...</td>
+						</tr>
+					</table>
+				</fieldset>
+				<input name="Station1" id="Station1" type="hidden" />
+				<input name="Station2" id="Station2" type="hidden" />
+				<input name="Station3" id="Station3" type="hidden" />
+				<input name="Station4" id="Station4" type="hidden" />
+				<input name="Station5" id="Station5" type="hidden" />
+				<input name="Station6" id="Station6" type="hidden" />
+				<input name="Station7" id="Station7" type="hidden" />
+				<input name="Station8" id="Station8" type="hidden" />
+			</form>
+		</div>
+	</body>
+	<footer>
+		<script type="text/javascript">
+		
+			GI("Message").style.display = "none";
+			GI("Main").style.visibility = "visible";
+			
+			function OnLoad()
+			{
+				Restore(1);
+				for (var nI = 1; nI <= 8; nI++)
+				{
+					BuildTimeList(nI);
+					BuildProgList(nI);
+				}
+				var StatDet = arrayStat[0];
+				RestList("SelRnTms", StatDet.arrayTimes);
+				RestList("SelDts", StatDet.arrayDates);
+				DoEnable(true);
+			}
+
+			function DoEnable()
+			{
+				var nI = 0;
+				var strID;
+				var Input = null;
+				
+				GI("SelStation").disabled = false;
+				GI("SelStation").selectedIndex = 0;
+								GI("Desc").disabled = false;
+				GI("TxtStDate").disabled = false;
+				GI("TxtEnDate").disabled = false;		
+				GI("RadFrqMn").disabled = false;
+				GI("RadFrqMn").checked = true;
+				GI("SelMnFreq").disabled = false;
+				GI("RadFrqWk").disabled = false;
+				GI("RadFrqWk").checked = false;
+				GI("RadFrqDaily").disabled = false;
+				GI("RadFrqDaily").disabled = false;
+				GI("TimeStart").disabled = false;
+				GI("TimeEnd").disabled = false;
+				GI("NumRnTm").disabled = false;
+				GI("SelRnFreq").disabled = false;
+				GI("SelRnTms").disabled = false;
+				GI("SelDts").disabled = false;	
+				var StatDet = arrayStat[0];
+				EnSelFreq(StatDet.nRadFrq);
+				SetRadFrq(StatDet.nRadFrq);
+				EnUploadBttn();
+			}
+
+		</script>
+	</footer>
+</html>

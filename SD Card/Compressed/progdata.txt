@@ -1,0 +1,80 @@
+station1
+Station 1
+2
+0
+0
+1
+00:00
+00:00
+1/5
+1/9
+station2
+Station 2
+3
+5
+1
+2
+23:00
+23:00
+2/5
+2/9
+station3
+Station 3
+3
+4
+2
+3
+22:00
+22:00
+3/5
+3/9
+station4
+Station 4
+3
+3
+3
+4
+21:00
+21:00
+4/5
+4/9
+station5
+Station 5
+1
+0
+0
+0
+00:00
+00:00
+
+
+station6
+Station 6
+1
+0
+0
+0
+00:00
+00:00
+
+
+station7
+Station 7
+1
+0
+0
+0
+00:00
+00:00
+
+
+station8
+Station 8
+1
+0
+0
+0
+00:00
+00:00
+
+

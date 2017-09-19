@@ -1,0 +1,324 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+	<head>
+		<meta content="en-au" http-equiv="Content-Language" />
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+		<title>Wired Alarm Settings</title>
+		<style>
+			.Hyperlink
+			{
+				background-color:olive;
+				width:300px;
+				height:25px;
+				vertical-align:middle;
+				text-align:center;
+				border-radius:5px;
+				border: 2px solid olive;
+				margin-bottom:10px;	
+			}
+			.SansSerif
+			{
+				font-family:Arial,Helvetica,sans-serif
+			}
+			.White
+			{
+				color:white
+			}
+			.Red
+			{
+				color:red
+			}
+			.Heading
+			{
+				font-size:xx-large
+			}
+			.Large
+			{
+				font-size:large
+			}
+			.Medium
+			{
+				font-size:medium
+			}
+			.BorderInset
+			{
+				border:2px inset silver;
+				border-radius:3px;
+			}
+			.BorderOutset
+			{
+				border:2px outset silver
+				border-radius:3px;
+			}
+			.BorderBottom
+			{
+				border-bottom:3px ridge silver
+			}
+			.BorderTop
+			{
+				border-top:3px ridge silver
+			}
+			.BorderLeft
+			{
+				border-left:3px ridge silver
+			}
+			.BorderRight
+			{
+				border-right:3px ridge silver
+			}
+			.Teal
+			{
+				background:teal;
+			}
+			.Margin10Px
+			{
+				margin:10px 10px 10px 10px;
+			}
+			.TableStyle
+			{
+				width:100%;
+				border-collapse:collapse;
+			}
+			.Height20Px
+			{
+				height:20px;
+			}
+		</style>
+		
+		<script type="text/javascript">
+					
+			var arrayStat = new Array();
+
+			function structStat(bInstalled, bAuto, strDesc, nDryTime, nThreshold, nOnTime)
+			{
+				this.bInstalled = bInstalled;
+				this.bAuto = bAuto;
+				this.strDesc = strDesc;
+				this.nDryTime = nDryTime ;
+				this.nThreshold = nThreshold;			
+				this.nOnTime = nOnTime;
+			}
+/*
+			arrayStat.push(new structStat(inst, auto, "desc", dry, thresh, ontime);
+			arrayStat.push(new structStat(inst, auto, "desc", dry, thresh, ontime);
+    		arrayStat.push(new structStat(inst, auto, "desc", dry, thresh, ontime);
+			arrayStat.push(new structStat(inst, auto, "desc", dry, thresh, ontime);
+			arrayStat.push(new structStat(inst, auto, "desc", dry, thresh, ontime);
+			arrayStat.push(new structStat(inst, auto, "desc", dry, thresh, ontime);
+			arrayStat.push(new structStat(inst, auto, "desc", dry, thresh, ontime);
+			arrayStat.push(new structStat(inst, auto, "desc", dry, thresh, ontime);
+*/
+
+arrayStat.push(new structStat(true, true, "Front", 30, 50, 5));
+arrayStat.push(new structStat(true, false, "Back", 30, 50, 5));
+arrayStat.push(new structStat(false,false,"Veges",30,50,5));
+arrayStat.push(new structStat(false,false,"Apple tree",30,50,5));
+arrayStat.push(new structStat(false,false,"",0,0,0));
+arrayStat.push(new structStat(false,false,"",0,0,0));
+arrayStat.push(new structStat(false,false,"",0,0,0));
+arrayStat.push(new structStat(false,false,"",0,0,0));
+
+			function GetInput(strID)
+			{
+				var input = document.getElementById(strID);
+			
+				if (!input)
+					alert("ERROR: function GetInput(strID), strID = " + strID + "!");
+				
+				return input;
+			}
+
+			function OnClickInstalled(strProbeInstalledID, strProbeAutoID, strDryTimeID, strProbeThreshID, strOnTimeID)
+			{
+				var bInstalled = document.getElementById(strProbeInstalledID).checked;
+				var bAuto = document.getElementById(strProbeAutoID).checked;
+				
+				GetInput(strProbeAutoID).disabled = !bInstalled;				
+				GetInput(strProbeAutoID).checked = GetInput(strProbeAutoID).checked && bInstalled;				
+				GetInput(strDryTimeID).disabled = !bInstalled;				
+				GetInput(strProbeThreshID).disabled = !bInstalled;				
+				GetInput(strOnTimeID).disabled = (bInstalled != bAuto) || (!bInstalled  && !bAuto);				
+			}
+			
+			function OnClickAuto(strAutoID, strOnTimeID)
+			{
+				GetInput(strOnTimeID).disabled = !GetInput(strAutoID).checked;
+			}
+			
+			function SaveStationDetails(nI)
+			{
+				arrayStat[nI].bInstalled = GetInput("Installed").checked;
+				arrayStat[nI].bAuto = GetInput("Auto").checked;
+				arrayStat[nI].nDryTime = Number(GetInput("DryTime").value);
+				arrayStat[nI].nThreshold = Number(GetInput("Thresh").value);			
+				arrayStat[nI].nOnTime = Number(GetInput("OnTime").value);
+			}
+			
+			function RecallStationDetails(nI)
+			{
+				GetInput("Installed").checked = arrayStat[nI].bInstalled;
+				GetInput("Auto").checked = arrayStat[nI].bAuto;
+				GetInput("DryTime").value = arrayStat[nI].nDryTime.toString();
+				GetInput("Thresh").value = arrayStat[nI].nThreshold.toString();			
+				GetInput("OnTime").value = arrayStat[nI].nOnTime.toString();
+				GetInput("Desc").value = arrayStat[nI].strDesc;
+			}
+			
+			var nLastStation = 0;
+			
+			function OnStationChange()
+			{
+				var StationSelect = GetInput("SelStation");
+				var StationDetails = arrayStat[StationSelect.selectedIndex];
+				
+				SaveStationDetails(nLastStation);
+				nLastStation = StationSelect.selectedIndex;
+				RecallStationDetails(nLastStation);
+				OnClickInstalled("Installed", "Auto", "DryTime", "Thresh", "OnTime");
+				OnClickAuto("Auto", "OnTime");
+			}
+			
+			function OnClickUpload()
+			{
+				var nI, nStationNum, strID, strTag = "S", Station;
+				
+				OnStationChange();
+				for (nI = 0; nI < 8; nI++)
+				{
+					nStationNum = nI + 1;
+					strID = strTag + nStationNum;
+				    Station = GetInput(strID);
+				    Station.value = arrayStat[nI].bInstalled.toString() + "#" + arrayStat[nI].bAuto + "#" + arrayStat[nI].nDryTime.toString() + "#" + 
+				    				arrayStat[nI].nThreshold.toString() + "#" + arrayStat[nI].nOnTime.toString();
+				}
+				GetInput("SelStation").disabled = true;
+				GetInput("Desc").disabled = true;
+				GetInput("Installed").disabled = true;
+				GetInput("Auto").disabled = true;
+				GetInput("DryTime").disabled = true;
+				GetInput("Thresh").disabled = true;
+				GetInput("OnTime").disabled = true;
+				document.getElementById("AlarmsForm").submit();
+			}
+						
+		</script>
+		
+	</head>
+	
+	<body class="Teal" onload="OnLoad()">
+	
+		<div style="visibility:visible;" class="SansSerif Black" id="Main">
+			<span id="Message" class="Heading Red"><strong>Please be patient while the web page downloads from the irrigation controller...</strong></span>
+			<br />
+			<span class="Heading"><strong><u>
+			<br />
+			Greg's Irrigation Controller </u></strong></span>
+			<span class="Medium"><span class="Heading"><strong><u>- ####</u></strong></span><br /><br />The user manual can be found at:<br />
+				<a href="http://www.gregsindigenouslandscapes.com.au/UserManual.php">http://www.gregsindigenouslandscapes.com.au/UserManual.php</a>
+			<br />
+			</span>
+			<br />
+			<div class="Hyperlink">
+				<a href="program.htm" class="Large"><b>Go to irrigation program</b></a>
+			</div>
+			<div class="Hyperlink">
+				<a href="clock.htm" class="Large"><b>Go to system clock</b></a>
+			</div>
+			<div class="Hyperlink">
+				<a href="manual.htm" class="Large"><b>Go to manual control</b></a>
+			</div>
+			<div class="Hyperlink">
+				<a href="email.htm" class="Large"><b>Go to email settings</b></a>
+			</div>
+			&nbsp;<form action="walarms.htm" method="GET" id="AlarmsForm" accept-charset="ASCII" style="background-color:silver;border:medium silver outset;border-radius:3px;width:80%">
+						<div class="Heading" style="color:blue;margin:10px 10px 10px 12px"><b>Wired soil moisture alarms</b></div>
+						<div class="Medium" style="color:black;margin:10px 10px 20px 12px">
+							For probe theshold values, 60 or less indicates 
+							bone dry soil while 90 or more indicates sopping wet soil.<br />
+							<br />
+							If you click 'Auto' the station will be truned on 
+							for specified number of minutes when ever the probe reading remains 
+							below the specified value for the specified number 
+							of minutes.</div>
+						<fieldset name="Group1" class="Margin10Px">
+							<legend>Soil probe settings for</legend>
+							<table class="TableStyle" style="border:0px silver solid">
+								<tr>	
+									<td valign="middle" align="left">
+										<select name="SelStation" id="SelStation" style="width: 82px; height: 22px;" tabindex="1" onchange="OnStationChange()">
+											<option selected="selected" value="1">Station 1
+											</option>
+											<option value="2">Station 2</option>
+											<option value="3">Station 3</option>
+											<option value="4">Station 4</option>
+											<option value="5">Station 5</option>
+											<option value="6">Station 6</option>
+											<option value="7">Station 7</option>
+											<option value="8">Station 8</option>
+										</select>
+									</td>
+									<td valign="middle" align="left" colspan="7">
+										<input class="BorderInset Height20Px" name="Desc" id="Desc" type="text" value="" readonly="readonly" tabindex="3" />
+									</td>
+								</tr>
+								<tr>
+									<td valign="middle" align="left">
+									<input name="Installed" id="Installed" type="checkbox" onclick="OnClickInstalled('Installed', 'Auto', 'DryTime', 'Thresh', 'OnTime')" tabindex="1" value="1" />&nbsp;Installed
+									<br />
+									<input name="Auto" id="Auto" type="checkbox" disabled="disabled" onclick="OnClickAuto('Auto', 'OnTime')" tabindex="2" value="1" />Auto</td>
+									<td valign="middle" align="right">Allowed dry time (min):</td>
+									<td valign="middle" align="left">
+									<input class="BorderInset Height20Px" name="DryTime" id="DryTime" type="number" value="10" min="10" max="360" disabled="disabled" tabindex="3" /></td>
+									<td valign="middle" align="right">Probe threshold value:</td>
+									<td valign="middle" align="left">
+									<input class="BorderInset Height20Px" value="50" min="0" max="100" name="Thresh" id="Thresh" type="number" disabled="disabled" tabindex="4" /></td>
+									<td valign="middle" align="right">On time (minutes):</td>
+									<td valign="middle" align="left">
+									<input class="BorderInset Height20Px" value="10" min="0" max="30" name="OnTime" id="OnTime" type="number" disabled="disabled" tabindex="5" /></td>
+								</tr>
+							</table>
+						</fieldset>
+						<table class="TableStyle">
+							<tr>
+								<td valign="middle" align="center" colspan="2">
+									<input style="width:240px" class="BorderOutset" name="Upload" id="Upload" type="button" value="Upload alarms to irrigation controller" onclick="OnClickUpload()" tabindex="41" />&nbsp;&nbsp;&nbsp;&nbsp;
+								</td>
+							</tr>
+							<tr>
+								<td class="Large SansSerif" style="color:teal" valign="middle" align="center" colspan="2">
+									Alarm details have not been uploaded yet...
+								</td>
+							</tr>
+						</table>
+						<br />
+						<input name="S1" id="S1" type="hidden" />
+						<input name="S2" id="S2" type="hidden" />
+						<input name="S3" id="S3" type="hidden" />
+						<input name="S4" id="S4" type="hidden" />
+						<input name="S5" id="S5" type="hidden" />
+						<input name="S6" id="S6" type="hidden" />
+						<input name="S7" id="S7" type="hidden" />
+						<input name="S8" id="S8" type="hidden" />
+				</form>
+		</div>
+	
+	</body>
+	
+	<footer>
+	
+		<script type="text/javascript">
+		
+			GetInput("SelStation").selectedIndex = 0;
+			GetInput("Message").style.display = "none";
+			GetInput("Main").style.visibility = "visible";
+			RecallStationDetails(nLastStation);
+			OnClickInstalled("Installed", "Auto", "DryTime", "Thresh", "OnTime");
+			OnClickAuto("Auto", "OnTime");
+	
+		</script>
+		
+	</footer>
+	
+</html>
+

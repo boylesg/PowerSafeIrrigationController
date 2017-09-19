@@ -1,0 +1,357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta content="en-au" http-equiv="Content-Language" />
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+		<title>System Clock</title>
+		<style type="text/css">
+			.Hyperlink
+			{
+				background-color:olive;
+				width:300px;
+				height:25px;
+				vertical-align:middle;
+				text-align:center;
+				border-radius:5px;
+				border: 2px solid olive;
+				margin-bottom:10px;	
+			}
+			.SansSerif
+			{
+				font-family:Arial,Helvetica,sans-serif
+			}
+			.Black
+			{
+				color:black
+			}
+			.Red
+			{
+				color:red
+			}
+			.Heading
+			{
+				font-size:xx-large
+			}
+			.Large
+			{
+				font-size:large
+			}
+			.Medium
+			{
+				font-size:medium
+			}
+			.BorderInset
+			{
+				border:2px inset silver;
+				border-radius:3px;
+			}
+			.BorderOutset
+			{
+				border:2px outset silver;
+				border-radius:3px;
+			}
+			.BorderBottom
+			{
+				border-bottom:3px ridge silver
+			}
+			.BorderTop
+			{
+				border-top:3px ridge silver
+			}
+			.BorderLeft
+			{
+				border-left:3px ridge silver
+			}
+			.BorderRight
+			{
+				border-right:3px ridge silver
+			}
+			.Teal
+			{
+				background:teal;
+			}
+			.Width
+			{
+				width:40px
+			}
+			.CellHeight
+			{
+				height:40px
+			}
+			
+		</style>
+		
+	</head>
+	
+	<body class="Teal SansSerif" onload="OnLoad()">
+		
+		<span id="Message" class="Heading Red"><strong><br />Please be patient while the web page downloads from the irrigation controller...</strong></span>
+				
+		<div style="visibility:visible;" class="Black" id="Main">
+			<span class="Heading"><strong><u><br />
+			Greg's Irrigation Controller - ####</u></strong></span><br />
+			<span class="Medium"><br />
+			The user manual can be found at:<br />
+				<a href="http://www.gregsindigenouslandscapes.com.au/UserManual.php">http://www.gregsindigenouslandscapes.com.au/UserManual.php</a>
+			<br />
+			</span>
+			<br />
+			<div class="Hyperlink">
+				<a href="program.htm" class="Large"><b>Go to irrigation program</b></a>
+			</div>
+			<div class="Hyperlink">
+				<a href="walarms.htm" class="Large"><b>Go to wired soil moisture alarms</b></a>
+			</div>
+			<div class="Hyperlink">
+				<a href="email.htm" class="Large"><b>Go to email settings</b></a>
+			</div>
+			<div class="Hyperlink">
+				<a href="manual.htm" class="Large"><b>Go to manual control</b></a>
+			</div>
+				&nbsp;<form action="clock.htm" method="GET" id="ClockForm"  accept-charset="ASCII" style="background-color:silver;border:medium silver outset;border-radius:3px;width:60%">
+						<div class="Heading" style="color:blue;margin:10px 10px 10px 12px"><b>System clock</b></div>
+
+				<fieldset name="GroupBattery">
+					<legend class="Large SansSerif" style="width:119px"><strong>Clock battery</strong></legend>
+						<table style="width:100%;border-collapse:collapse;border:3px ridge silver" class="Medium SansSerif">
+						<tr>
+							<td class="CellHeight" valign="middle" align="left" class="Medium SansSerif">
+								<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="range" id="RangeBattery" name="RangeBattery" min="0" max="300" step="1" style="width:199px" tabindex="1" value="VOLTAGE_SLIDER" disabled="disabled">
+							</td>
+						</tr>
+						<tr>
+							<td class="CellHeight" valign="middle" align="left" class="Medium SansSerif">
+								&nbsp;&nbsp;&nbsp;0.0V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.5V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.0V</td>
+						</tr>
+						<tr>
+							<td class="CellHeight" valign="middle" align="left" class="Medium SansSerif">&nbsp;</td>
+						</tr>
+						<tr>
+							<td class="CellHeight" valign="middle" align="left" style="color:teal" class="Medium SansSerif">
+								&nbsp;&nbsp;&nbsp;VOLTAGE_TEXT<br /><br />
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+				<fieldset name="GroupID">
+					<legend class="Large SansSerif" style="width:199px"><strong>Irrigation Controller ID</strong></legend>
+						<table style="width:100%;border-collapse:collapse;border:3px ridge silver" class="Medium SansSerif">
+						<tr>
+							<td class="CellHeight" valign="middle" align="left" style="color:teal" class="Medium SansSerif">
+								
+							<input name="TextID" size="12" style="width: 180px" tabindex="2" type="text" value="XXXX" placeholder="Unique ID for this controller" /></td>
+						</tr>
+					</table>
+				</fieldset>
+				<fieldset name="GroupTime">
+					<legend class="Large SansSerif" style="width:119px"><strong>System time</strong></legend>
+						<table style="width:100%;border-collapse:collapse;border:3px ridge silver" class="Medium SansSerif">
+						<tr>
+							<td class="CellHeight" valign="middle" align="right" class="Medium SansSerif">
+								Current system time:
+							</td>
+							<td class="CellHeight" valign="middle" align="left" class="Medium SansSerif">
+								&nbsp;&nbsp;&nbsp;&nbsp;SYSTEM_TIME
+							</td>
+						</tr>
+						<tr>
+							<td class="CellHeight" valign="middle" align="right" class="Medium SansSerif">
+								Change system date & time:
+							</td>
+							<td class="CellHeight" valign="middle" align="left" class="Medium SansSerif CellHeight">
+								&nbsp;&nbsp;&nbsp;&nbsp;<label id="LabelDOW" style="vertical-align:middle">Monday</label>&nbsp;
+								<input name="NumberDay" id="NumberDay" type="number" min="1" max="31" step="1" class="Width" value="" onchange="OnChangeDay()" tabindex="3" /> :
+								<input name="NumberMonth" id="NumberMonth" type="number" min="1" max="12" step="1" class="Width" value="" onchange="onChangeMonth()" tabindex="4" /> :
+								<input name="NumberYear" id="NumberYear" type="number" min="0" max="10000" step="1" style="width:60px" value="" onchange="OnChangeYear()" tabindex="5" />
+								&nbsp;&nbsp;&nbsp;&nbsp;
+								<input name="NumberHour" id="NumberHour" type="number" min="0" max="23" step="1" class="Width" value="" style="height: 22px" tabindex="6" /> :
+								<input name="NumberMinute" id="NumberMinute" type="number" min="0" max="60" step="1" class="Width" value="" tabindex="7" /> :
+								<input name="NumberSecond" id="NumberSecond" type="number" min="0" max="60" step="1" class="Width" value="" tabindex="8" /></td>
+						</tr>
+						<tr>
+							<td class="CellHeight" valign="middle" align="right" class="Medium SansSerif CellHeight">
+								Select your time zone:
+							</td>
+							<td class="CellHeight" valign="middle" align="left" class="Medium SansSerif CellHeight">
+								&nbsp;<select name="SelectTimezone" style="width: 404px; height: 22px" tabindex="9">
+								<option value="-11">UTC - 11hrs</option>
+								<option value="-10">UTC - 10hrs</option>
+								<option value="-9">UTC - 9hrs</option>
+								<option value="-8">UTC - 8hrs</option>
+								<option value="-7">UTC - 7hrs</option>
+								<option value="-6">UTC - 6hrs</option>
+								<option value="-5">UTC - 5hrs</option>
+								<option value="-4">UTC - 4hrs</option>
+								<option value="-3">UTC - 3hrs</option>
+								<option value="-2">UTC - 2hrs</option>
+								<option value="-1">UTC - 1hr</option>
+								<option value="0">UTC</option>
+								<option value="1">UTC + 1hr</option>
+								<option value="2">UTC + 2hrs</option>
+								<option value="3">UTC + 3hrs</option>
+								<option value="4">UTC + 4hrs</option>
+								<option value="5">UTC + 5hrs</option>
+								<option value="6">UTC + 6hrs</option>
+								<option value="7">UTC + 7hrs</option>
+								<option value="8">UTC + 8hrs</option>
+								<option value="9">UTC + 9hrs</option>
+								<option selected value="10">UTC + 10hrs</option>
+								<option value="11">UTC + 11hrs</option>
+								<option value="12">UTC + 12hrs</option>
+								<option value="13">UTC + 13hrs</option>
+								<option value="14">UTC + 14hrs</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="CellHeight" valign="middle" align="right" class="Medium SansSerif CellHeight">&nbsp;</td>
+							<td class="CellHeight" valign="middle" align="left" class="Medium SansSerif CellHeight">
+								UTC is universal (or Greenwich mean) time<br /><br />
+								
+								<input name="CheckboxDaylightSavings" type="checkbox" checked tabindex="10" value="on"/> 
+								Adjust time for daylight savings</td>
+						</tr>
+						<tr>
+							<td class="CellHeight" valign="middle" align="center" colspan="2" class="Medium SansSerif">
+								<input id="ButtonUpload" name="ButtonUpload" type="submit" class="BorderOutset" style="width:250px" value="Upload time to irrigation controller" tabindex="11" />&nbsp;&nbsp;&nbsp;&nbsp;
+							</td>
+						</tr>
+						<tr>
+							<td valign="middle" align="center" colspan="2" align="left" class="Medium SansSerif" style="color:teal">Time not uploaded yet...</td>
+						</tr>
+					</table>
+				</fieldset>
+				<input name="HiddenDOW" id="HiddenDOW" type="hidden" />
+			</form>
+		</div>
+
+		<script type="text/javascript">
+				
+			function GetInput(strID)
+			{
+				var input = document.getElementById(strID);
+				
+				if (!input)
+					alert("ERROR: function GetInput(strID), strID = " + strID + "!");
+					
+				return input;
+			}
+			function isLeapYear(nYear)
+			{
+				return false;
+			}
+			
+			function UpdateDOW()
+			{
+				var numberDay = GetInput("NumberDay");
+				var numberMonth = GetInput("NumberMonth");
+				var numberYear = GetInput("NumberYear");
+				var labelDOW = GetInput("LabelDOW");
+				var hiddenDOW = GetInput("HiddenDOW");
+			
+				if (numberDay && numberMonth && numberYear && labelDOW)
+				{
+					date = new Date();
+
+					date.setDate(numberDay.value);
+					date.setMonth(numberMonth.value - 1);
+					date.setYear(numberYear.value);
+					
+					var nDOW = date.getDay();
+
+					if (nDOW == 0)
+						labelDOW.innerHTML = "Sunday";
+					else if (nDOW == 1)
+						labelDOW.innerHTML = "Monday";
+					else if (nDOW == 2)
+						labelDOW.innerHTML = "Tuesday";
+					else if (nDOW == 3)
+						labelDOW.innerHTML = "Wednesday";
+					else if (nDOW == 4)
+						labelDOW.innerHTML = "Thursday";
+					else if (nDOW == 5)
+						labelDOW.innerHTML = "Friday";
+					else if (nDOW == 6)
+						labelDOW.innerHTML = "Saturday";
+						
+					hiddenDOW.value = nDOW;
+				}
+			}
+			
+			function onChangeDay()
+			{
+				UpdateDOW();
+			}
+			
+			function onChangeYear()
+			{
+				UpdateDOW();
+			}
+			
+			function onChangeMonth()
+			{
+				var numberDay = GetInput("NumberDay");
+				var numberMonth = GetInput("NumberMonth");
+				var numberYear = GetInput("NumberYear");
+			
+				if (numberDay && numberMonth && numberYear)
+				{
+					var nMonth = numberMonth.value;
+					var nMax = 0;
+					
+					if (numberMonth == 2)
+					{		
+						if (isLeapYear(numberYear.value))
+							nMax = 29;
+						else
+							nMax = 28;
+					}
+					else if ((nMonth == 4) || (nMonth == 6) || (nMonth == 9) || (nMonth == 11))
+					{			
+						nMax = 30;
+					}
+					else
+					{		
+						nMax = 31;
+					}
+					numberDay.max = nMax;	
+
+				}
+				UpdateDOW();
+			}
+			
+			function UpdateSeconds()
+			{
+				var dateNow = new Date();
+				GetInput("NumberSecond").value = dateNow.getSeconds();
+				GetInput("NumberMinute").value = dateNow.getMinutes();
+				GetInput("NumberHour").value = dateNow.getHours();
+				GetInput("NumberDay").value = dateNow.getDate();
+				setTimeout(UpdateSeconds, 1000);
+			}
+
+			var dateToday = new Date();
+
+			GetInput("NumberHour").value = dateToday.getHours();
+			GetInput("NumberMinute").value = dateToday.getMinutes();
+			GetInput("NumberSecond").value = dateToday.getSeconds();
+			
+			GetInput("NumberYear").value = dateToday.getFullYear();
+			GetInput("NumberYear").min = dateToday.getFullYear();
+			GetInput("NumberMonth").value = dateToday.getMonth() + 1;
+			GetInput("NumberDay").value = dateToday.getDate();
+			onChangeMonth();
+			UpdateDOW();
+			
+			setTimeout(UpdateSeconds, 1000);
+							
+		</script>
+
+	</body>
+	<footer>
+		<script type="text/javascript">
+			GetInput("Message").style.display = "none";
+			GetInput("Main").style.visibility = "visible";
+		</script>
+	</footer>
+</html>

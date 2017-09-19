@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta content="en-au" http-equiv="Content-Language" /><meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>Manual Control</title><style type="text/css">.HL{background-color:olive;width:300px;height:25px;vertical-align:middle;text-align:center;border-radius:5px;border:2px solid olive;margin-bottom:10px}
+.SS{font-family:Arial,Helvetica,sans-serif}.W{color:white}.R{color:red}.H{font-size:xx-large}.L{font-size:large}.M{font-size:medium}.BI{border:2px inset silver;border-radius:3px}.BO{border:2px outset silver border-radius:3px}
+.BB{border-bottom:3px ridge silver}.BT{border-top:3px ridge silver}.BL{border-left:3px ridge silver}.BR{border-right:3px ridge silver}.T{background:teal}.H{font-size:xx-large}</style></head>
+<body class="T SS" onload="OnLoad()"><div style="visibility:visible" class="SS Black" id="Main"><span id="Message" class="H R"><strong>Please be patient while the web page downloads from the irrigation controller...
+</strong></span><br /><span class="H"><strong><u><br />Greg's Irrigation Controller - ####</u></strong></span><br /><br />The user manual can be found at:<br />
+<a href="http://www.gregsindigenouslandscapes.com.au/UserManual.php">http://www.gregsindigenouslandscapes.com.au/UserManual.php</a><br /><br /><div class="HL">
+<a href="program.htm" class="L"><b>Go to irrigation program</b></a></div><div class="HL"><a href="clock.htm" class="L"><b>Go to system clock</b></a></div><div class="HL">
+<a href="email.htm" class="L"><b>Go to email settings</b></a></div><div class="HL"><a href="walarms.htm" class="L"><b>Go to alarm settings</b></a></div>&nbsp;
+<form action="manual.htm" method="GET" id="ManualForm" accept-charset="ASCII" style="background-color:silver;border:medium silver outset;border-radius:3px;width:60%">
+<div class="H" style="color:blue;margin:10px 10px 10px 12px"><b>Manual control</b></div><fieldset name="GS"><legend class="L SS" style="width:64px"><strong>Station</strong></legend>
+<table style="width:100%;border-collapse:collapse;border:none;" class="M SS"><tr><td valign="middle" align="left" class="CH M SS">&nbsp;&nbsp;
+<input checked="checked" id="Radio1" name="RadStat" type="radio" tabindex="1" value="1" onclick="OnChangeStation('~1')" />Station 1</td><td valign="middle" align="left" class="CH M SS">&nbsp;&nbsp;
+<input id="Radio2" name="RadStat" type="radio" tabindex="2" value="2" onclick="OnChangeStation('~2')" /> Station 2</td><td valign="middle" align="left" class="CH M SS">&nbsp;&nbsp;
+<input id="Radio3" name="RadStat" type="radio" tabindex="3" value="3" onclick="OnChangeStation('~3')" /> Station 3</td><td valign="middle" align="left" class="CH M SS">&nbsp;&nbsp;
+<input id="Radio4" name="RadStat" type="radio" tabindex="4" value="4" onclick="OnChangeStation('~4')" /> Station 4</td></tr><tr><td valign="middle" align="left" class="CH M SS">&nbsp;&nbsp;
+<input id="Radio5" name="RadStat" type="radio" tabindex="5" value="5" onclick="OnChangeStation('~5')" /> Station 5</td><td valign="middle" align="left" class="CH M SS">&nbsp;&nbsp;
+<input id="Radio6" name="RadStat" type="radio" tabindex="6" value="6" onclick="OnChangeStation('~6')" /> Station 6</td><td valign="middle" align="left" class="CH M SS">&nbsp;&nbsp;
+<input id="Radio7" name="RadStat" type="radio" tabindex="7" value="7" onclick="OnChangeStation('~7')" /> Station 7</td><td valign="middle" align="left" class="CH M SS">&nbsp;&nbsp;
+<input id="Radio8" name="RadStat" type="radio" tabindex="8" value="8" onclick="OnChangeStation('~8')" /> Station 8</td></tr><tr><td valign="middle" align="left" colspan="4" class="CH M SS">
+<input name="TextDesc" id="TextDesc" type="text" style="width:178px; height:18px" readonly /></td></tr><tr><td valign="middle" align="right" class="CH M SS">Turn station on for:</td>
+<td valign="middle" align="left" class="CH M SS"><input name="Runtime" id="Runtime" class="BorderInset" style="width: 60px" type="number" min="1" max="120" size="3" tabindex="9" value="10" />&nbsp;minutes</td>
+<td valign="middle" align="right" class="CH M SS">Turn station off:</td><td valign="middle" align="left" class="CH M SS">
+<input name="CheckboxOff" id="CheckboxOff" tabindex="10" type="checkbox" value="off" onclick="OnStationOff()" /></td></tr><tr><td valign="middle" align="right" colspan="2" class="CH M SS">
+<input style="width:180px" class="BO" name="Upload" tabindex="10" type="submit" value="Upload to irrigation controller" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="width:180px" valign="middle" align="left" colspan="2" class="CH M SS">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input name="Reset" type="reset" class="BO" value="Clear form and start over" tabindex="11" /></td>
+</tr><tr><td style="color:teal" valign="middle" align="left" colspan="4" class="CH L M SS">&nbsp;&nbsp;All stations are currently off...</td></tr></table></fieldset></form></div></body><footer>
+<script type="text/javascript">function GI(b){var a=document.getElementById(b);if(!a){alert("ERROR: function GI(strID), strID = "+b+"!")}return a}GI("Message").style.display="none";GI("Main").style.visibility="visible";
+function OnStationOff(){GI("Runtime").disabled = GI("CheckboxOff").checked}function OnChangeStation(strDesc){GI("TextDesc").value = strDesc}function SetDesc()if (GI("Radio1").checked)OnChangeStation("~1");else 
+if (GI("Radio2").checked)OnChangeStation("~2");else if (GI("Radio3").checked)OnChangeStation("~3");else if (GI("Radio4").checked)OnChangeStation("~4");else if (GI("Radio5").checked)OnChangeStation("~5");else 
+if (GI("Radio6").checked)OnChangeStation("~6");else if (GI("Radio7").checked)OnChangeStation("~7");else if (GI("Radio8").checked)OnChangeStation("~8");}SetDesc();
+function OnChangeStation(strDesc){GI("TextDesc").value = strDesc;}</script></footer></html>
