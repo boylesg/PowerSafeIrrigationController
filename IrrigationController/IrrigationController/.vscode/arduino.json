@@ -1,0 +1,4 @@
+{
+    "sketch": "IrrigationController.ino",
+    "board": "arduino:avr:uno"
+}
