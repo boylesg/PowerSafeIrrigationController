@@ -40,7 +40,7 @@ class CProgram
     void dumpPageData(const uint8_t nStation);
     void dumpPageData();
     void run(CSerialManager& SerialManager);
-    void begin(CSerialManager& SerialManager);
+    void begin(CSerialManager& SerialManager, const WiFiEspUDP* pSerialSrc);
 
   	bool openIrrigProgramPageDataFile(CTextFile& file, CString &strMsg);
   	bool openIrrigProgramFile(CTextFile& file, CString &strMsg);
@@ -81,7 +81,6 @@ class CProgram
     #ifdef AUTO_SOLENOID
       bool isActive(const uint8_t nStationNum);
       void setActive(const uint8_t nStationNum, IPAddress ipAddr);
-      void getRemoteStations(CSerialManager& SerialManager);
     #endif    
   protected:
 

@@ -17,8 +17,11 @@ class CSerialManager
 		virtual ~CSerialManager();
 
 		// Interface
-		void processData(Stream *pSerialHC05);
-		void processData(WiFiEspUDP *pUDPServer);
+    #ifdef AUTO_SOLENOID
+      void getRemoteStations(WiFiEspUDP *pUDPServer, CProgram& program);
+    #endif
+    void processData(Stream *pSerialHC05);
+    void processData(WiFiEspUDP *pUDPServer);
     bool readWord(CString& strBuff);
     bool writeWord(const char *strBuff)
     {

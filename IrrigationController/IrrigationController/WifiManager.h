@@ -78,8 +78,12 @@ class CWifiManager
 		int8_t getTimezone()
 		{
 			return m_nTimezone;
-		}
-    
+		} 
+    WiFiEspUDP* getUDPServer()
+    {
+      return &m_UDPServer;
+    };
+
 	protected:
 		// Helper functions
 		bool readEmailSettings();

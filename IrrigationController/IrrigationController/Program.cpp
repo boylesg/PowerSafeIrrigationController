@@ -32,11 +32,12 @@ CProgram::~CProgram()
 {
 }
 
-void CProgram::begin(CSerialManager& SerialManager)
+void CProgram::begin(CSerialManager& SerialManager, const WiFiEspUDP* pSerialSrc)
 {
   m_pTimer = timers.add(0, 0, NULL);
   #ifdef AUTO_SOLENOID
-    getRemoteStations(SerialManager);
+    while (true)
+    SerialManager.getRemoteStations(pSerialSrc, *this);
   #else
     for (uint8_t nStationNum = 0, nPinNum = 0; nStationNum < MAX_STATIONS; nStationNum++)
     {
@@ -50,57 +51,6 @@ void CProgram::begin(CSerialManager& SerialManager)
 }
 
 #ifdef AUTO_SOLENOID
-  void CProgram::getRemoteStations(CSerialManager& SerialManager)
-  {
-    uint8_t nStationNum = 0;
-    CBuff<16> buff1, buff2;
-    CString strData(buff1), strIP(buff2);
-    uint32_t nStartMillis = 0;
-    
-    for (nStationNum = 1; nStationNum <= MAX_STATIONS; nStationNum++)
-    {     
-      strData = F("request");
-      strData += SerialManager.getDelim();
-      strData += fromUint(nStationNum, 10);
-      strData += SerialManager.getDelim();
-      strIP = WiFi.localIP();
-      strData += strIP;
-
-      IPAddress ip(255, 255, 255, 255);
-      if (!SerialManager.writeWord(strData, ip))
-        debug.logRuntimeError(F("program.cpp"), __LINE__);
-  
-      nStartMillis = millis();
-      do
-      {
-        if (SerialManager.readWord(strData))
-        {
-          if (strData.indexOf(F("notify")))
-          {
-            if (SerialManager.readWord(strData))
-            {
-              uint8_t nStation = strData.toUint();
-              if ((nStation >= 1) && (nStation <= MAX_STATIONS))
-              {
-                IPAddress ipAddr;
-                if (SerialManager.readWord(strData))
-                  ipAddr.fromString(strData);
-                else
-                  debug.logRuntimeError(F("program.cpp"), __LINE__);
-                setActive(nStation, ipAddr);
-              }
-              else
-                debug.logRuntimeError(F("program.cpp"), __LINE__);
-            }
-            else
-              debug.logRuntimeError(F("program.cpp"), __LINE__);
-          }
-        }
-      }
-      while ((millis() - nStartMillis) <= 1000);
-    }
-  }
-
   bool CProgram::isActive(const uint8_t nStationNum)
   {
     bool bResult = false;

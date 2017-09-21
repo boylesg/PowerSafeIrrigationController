@@ -1,4 +1,4 @@
-#include <RealTimeClockDS1307.h>
+  #include <RealTimeClockDS1307.h>
 #include <TimeLib.h>
 #include <Wire.h>
 #include <MyBase64.h>
@@ -111,15 +111,16 @@ void setup()
 {
   Serial.begin(115200);
   while (!Serial);
+
   serialHC05.begin(38400);
   serialESP8266.begin(115200);
-  program.begin(SerialManager);
-      
+
   // Wait for serial port to connect - needed for native USB port only
   delay(10);
 
   if (initSD() && WifiManager.begin() && program.read())
   {
+    program.begin(SerialManager, WifiManager.getUDPServer());
     debug.init();
     rtc.readClock();
     timeLastAlarms.set(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds());
@@ -138,7 +139,7 @@ void setup()
 }
  
 void loop()
-{ 
+{
   timers.poll();
   
   if (serialHC05.available() > 0)

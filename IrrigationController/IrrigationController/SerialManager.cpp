@@ -637,7 +637,7 @@ bool CSerialManager::writeWord(const __FlashStringHelper *strBuff, IPAddress ip,
 bool CSerialManager::readWord(CString& strBuff)
 {
 	char cCh = 0;
-	int32_t nTimeout = millis() + ((uint32_t)10 * 1000);
+	uint32_t nMillis = millis(), nTimeout = (uint32_t)10000;
   Stream *pSerialSrc = NULL;
 
 	strBuff.empty();
@@ -652,13 +652,13 @@ bool CSerialManager::readWord(CString& strBuff)
   	{
   		if (strBuff.full())
   			break;
-  
-  		if ((nTimeout - millis()) < 0)
+
+  		if ((millis() - nMillis) > nTimeout)
   			break;
-        
+
   		if ((pSerialSrc->available() > 0))
   		{
-  			nTimeout = millis() + ((uint32_t)10 * 1000);
+  			nMillis = millis();
   			cCh = pSerialSrc->read();
   			if (cCh != m_cDelimiter)
         {
@@ -961,6 +961,73 @@ void CSerialManager::processData()
   }
 	debug.log(F("================================================================"));
 }
+
+#ifdef AUTO_SOLENOID
+  void CSerialManager::getRemoteStations(WiFiEspUDP *pUDPServer, CProgram& program)
+  {
+    uint8_t nStationNum = 0;
+    CBuff<32> buff;
+    CString strData(buff);
+    uint32_t nStartMillis = 0;
+    bool bRespRec = false;
+
+    m_pUDPServer = pUDPServer;
+    m_pSerialHC05 = NULL;
+    
+    for (nStationNum = 1; nStationNum <= MAX_STATIONS; nStationNum++)
+    { 
+      IPAddress ipL = WiFi.localIP(), ipB(ipL[0] & 255, ipL[1] & 255, ipL[2] & 255, 255);
+      strData = F("request");
+      strData += m_strDelimiter;
+      strData += fromUint(nStationNum, 10);
+      strData += m_strDelimiter;
+      strData += ipL;
+
+      if (!writeWord(strData, ipB, 10004))
+        debug.logRuntimeError(F("SerialManager.cpp"), __LINE__);
+
+      nStartMillis = millis();
+      do
+      {
+
+        if (readWord(strData))
+        {
+          if (strData.indexOf(F("notify")))
+          {
+            if (readWord(strData))
+            {
+              uint8_t nStation = strData.toUint();
+              if ((nStation >= 1) && (nStation <= MAX_STATIONS))
+              {
+                IPAddress ipAddr;
+                if (readWord(strData))
+                  ipAddr.fromString(strData);
+                else
+                  debug.logRuntimeError(F("SerialManager.cpp"), __LINE__);
+                program.setActive(nStation, ipAddr);
+
+                debug.log(F("received "), false);
+                debug.log(nStation, false);
+                debug.log(F(", "), false);
+                debug.log(ipAddr);
+                debug.log(F(""));
+                bRespRec = true;
+              }
+              else
+                debug.logRuntimeError(F("SerialManager.cpp"), __LINE__);
+            }
+            else
+              debug.logRuntimeError(F("SerialManager.cpp"), __LINE__);
+          }
+        }
+      }
+      while ((millis() - nStartMillis) <= 1000);
+
+      if (!bRespRec)
+        debug.log(F("no response"));
+    }
+  }
+#endif
 
 void CSerialManager::processData(Stream *pSerialHC05)
 {

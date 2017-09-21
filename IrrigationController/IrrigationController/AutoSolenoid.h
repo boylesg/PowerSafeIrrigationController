@@ -1,2 +1,2 @@
-//#define AUTO_SOLENOID 1
+#define AUTO_SOLENOID 1
 
