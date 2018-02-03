@@ -54,7 +54,7 @@ class CProgram
   	bool saveAlarmsData(CString &strMsg);
 
     CProgramStation* getStationDetails(uint8_t nI);
-    CTime& checkAlarms(CWifiManager& WifiManager, CTime& timeLast);
+    bool checkAlarms(CWifiManager& WifiManager, const uint32_t nSecsElapsed, CString& strSubject, CString& strMessage);
     uint8_t stationOn(const uint8_t nStation, const uint16_t nMinutes, CSerialManager* pSerialManager = NULL);
     void stationOff(const uint8_t nStation, CTimer* pTimer, CSerialManager *pSerialManager = NULL);
     uint8_t stationOff(const uint8_t nStation, CSerialManager* pSerialManager = NULL);
@@ -93,19 +93,15 @@ class CProgram
     static const uint8_t m_arrayRelayPinNums[MAX_STATIONS];
     static const uint8_t m_arrayProbePinNums[MAX_STATIONS];
     
-    const __FlashStringHelper* m_strProgramPageDataFilename;
-    const __FlashStringHelper* m_strProgramFilename;
-    const __FlashStringHelper* m_strAlarmsFilename;
-    
     CList m_listRun;
     CTimer *m_pTimer;
     CTime m_time;
     CDate m_date;
-
-    static CTextFile m_file;
 };
 
 extern CProgram program;
 
 #endif
+
+
 

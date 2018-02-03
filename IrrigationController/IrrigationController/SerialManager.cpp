@@ -9,15 +9,22 @@
 
 const char CSerialManager::m_cDelimiter = '`';
 const char *CSerialManager::m_strDelimiter = "`";
+char CSerialManager::m_strRemoteIP[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 CSerialManager::CSerialManager(CWifiManager &WifiManager, CProgram &program): m_WifiManager(WifiManager), m_program(program)
 {
 	m_pUDPServer = NULL;
 	m_pSerialHC05 = NULL;
+  memset(m_strRemoteIP, 0, sizeof m_strRemoteIP);
 }
 
 CSerialManager::~CSerialManager()
 {
+}
+
+void CSerialManager::setRemote(const char* strIPAddr)
+{
+  strcpy(m_strRemoteIP, strIPAddr);
 }
 
 void CSerialManager::empty()
@@ -544,17 +551,14 @@ void CSerialManager::updateSytemTime()
 
 void CSerialManager::updateWifiSSIDKey()
 {
-	CBuff<128> Buff128;
-	CBuff<40> MediumBuff1, MediumBuff2;
-	CString strNetworkName(MediumBuff1), strNetworkKey(MediumBuff2), strMsg(Buff128);
-
-	debug.log(F("Updating Wifi details\n"));
-	strMsg = F("The bluetooth data was interrupted - please try again!");
-
+	CBuff<128> BuffMsg;
+	CBuff<40> BuffName, BuffKey;
+	CString strNetworkName(BuffName), strNetworkKey(BuffKey), strMsg(BuffMsg);
+  
 	readWord(strNetworkName);
 	readWord(strNetworkKey);
 
-	debug.log(F("From HC-05...SSID = "), false);
+	debug.log(F("SSID = "), false);
 	debug.log(strNetworkName, false);
 	debug.log(F(", KEY = "), false);
 	debug.log(strNetworkKey, true);
@@ -562,35 +566,41 @@ void CSerialManager::updateWifiSSIDKey()
 	if ((strNetworkName.length() > 0) && (strNetworkKey.length() > 0))
 	{
 		m_WifiManager.updateWifiSSIDKey(strNetworkName, strNetworkKey, strMsg);
+    debug.log(strMsg);
 		writeWord(strMsg);
-    if (m_pSerialHC05)
-		delay(500);
+    delay(5000);
 		resetArd();
-	}
-	debug.log(strMsg);
-	writeWord(strMsg);
+  }
+  else
+  {
+    strMsg = F("Bluetooth data error - please try again!");
+    debug.log(strMsg);
+    writeWord(strMsg);
+  }
 }
 
-bool CSerialManager::writeWord(const char *strBuff, IPAddress ip, const uint16_t nPort)
+bool CSerialManager::writeWord(const char *strBuff, char *strIPAddr, const uint16_t nPort)
 {
-  int nSize = strlen(strBuff);
-  char *strDelimAdded = new char[nSize + 2];
+  int nSize = strlen(strBuff), nSendSize = 0;
 
+  char *strDelimAdded = new char[nSize + 2];
   if (strDelimAdded)
   {
-    memset(strDelimAdded, 0, nSize + 2);
+    memset(strDelimAdded, 0, sizeof strDelimAdded);
     strcpy(strDelimAdded, strBuff);
     strcat(strDelimAdded, m_strDelimiter);
 
   	if (m_pUDPServer)
   	{
+      IPAddress ip;
+      ip.fromString(strIPAddr);
 		  m_pUDPServer->beginPacket(ip, nPort);
-      nSize = m_pUDPServer->write(strDelimAdded, strlen(strDelimAdded));
+      nSendSize = m_pUDPServer->write(strDelimAdded, strlen(strDelimAdded));
 		  m_pUDPServer->endPacket();
 	  }
 	  else if (m_pSerialHC05)
 	  {
-      nSize = m_pSerialHC05->write(strDelimAdded);
+      nSendSize = m_pSerialHC05->write(strDelimAdded);
 	  }
     debug.log(F("Sending '"), false);
     debug.log(strBuff, false);
@@ -602,36 +612,56 @@ bool CSerialManager::writeWord(const char *strBuff, IPAddress ip, const uint16_t
       debug.log(F(" byte."));
     delete strDelimAdded;
   }
+  else
+    debug.logRuntimeError(F("SerialManager.cpp"), __LINE__);
+   
+  return nSendSize == nSize;
 }
 
-bool CSerialManager::writeWord(const __FlashStringHelper *strBuff, IPAddress ip, const uint16_t nPort)
+bool CSerialManager::writeWord(const __FlashStringHelper *strBuff, char *strIPAddr, const uint16_t nPort)
 {
-  uint16_t nSize = strlen_P((PGM_P)strBuff);
-  char *strDelimAdded = new char[nSize + 2];
-   
-  if (strDelimAdded)
+  uint16_t nSize = strlen_P((PGM_P)strBuff), nSentSize = 0;
+ 
+  if (nSize > 0)
   {
-    memset(strDelimAdded, 0, nSize + 2);
-    strcpy_P(strDelimAdded, (PGM_P)strBuff);
-    strcat(strDelimAdded, m_strDelimiter);
-    
-    if (m_pUDPServer)
+    char *strDelimAdded = new char[nSize + 2];
+    if (strDelimAdded)
     {
-      m_pUDPServer->beginPacket(ip, nPort);
-      nSize = m_pUDPServer->write(strDelimAdded, strlen(strDelimAdded));
-      m_pUDPServer->endPacket();
+      if (strDelimAdded)
+      {
+        memset(strDelimAdded, 0, nSize + 2);
+        strcpy_P(strDelimAdded, (PGM_P)strBuff);
+        strcat(strDelimAdded, m_strDelimiter);
+        
+        if (m_pUDPServer)
+        {
+          IPAddress ip;
+          ip.fromString(strIPAddr);
+debug.log(strIPAddr);
+debug.log(nPort);
+          m_pUDPServer->beginPacket(ip, nPort);
+          nSentSize = m_pUDPServer->write(strDelimAdded, strlen(strDelimAdded));
+          m_pUDPServer->endPacket();
+        }
+        else if (m_pSerialHC05)
+        {
+          nSentSize = m_pSerialHC05->write(strDelimAdded);
+        }
+        debug.log(F("Sending '"), false);
+        debug.log(strBuff, false);
+        debug.log(F("', "), false);
+        debug.log(nSize, false);
+        debug.log(F(" bytes."));
+        delete strDelimAdded;
+      }
     }
-    else if (m_pSerialHC05)
-    {
-      nSize = m_pSerialHC05->write(strDelimAdded);
-    }
-    debug.log(F("Sending '"), false);
-    debug.log(strBuff, false);
-    debug.log(F("', "), false);
-    debug.log(nSize, false);
-    debug.log(F(" bytes."));
-    delete strDelimAdded;
+    else
+      debug.logRuntimeError(F("SerialManager.cpp"), __LINE__);
   }
+  else
+    debug.logRuntimeError(F("SerialManager.cpp"), __LINE__);
+
+  return nSize == nSentSize;
 }
 
 bool CSerialManager::readWord(CString& strBuff)
@@ -730,16 +760,20 @@ void CSerialManager::processData()
   uint8_t nStation = 0;
   CBuff<56> Buff56;
   CString strWord(Buff56);
-
+  
 	// Wait for all the data to be transmitted
 	readWord(strWord);
 
-	debug.log(F("================================================================"));
-  if (m_pSerialHC05)
-    debug.dump(F("From HC-05, request"), strWord);
-  else if (m_pUDPServer)
-    debug.dump(F("From UDP, request"), strWord);
+	
+  if (!strWord.isEmpty())
+  {
+    debug.log(F("================================================================"));
 
+    if (m_pSerialHC05)
+      debug.dump(F("From HC-05, request"), strWord);
+    else if (m_pUDPServer)
+      debug.dump(F("From UDP, request"), strWord);
+  }
 	if (strWord.indexOf(F("wifi")) > -1)
 		updateWifiSSIDKey();
 	else if (strWord.indexOf(F("upload")) > -1)
@@ -953,13 +987,14 @@ void CSerialManager::processData()
   {
     processWirelessAlarmData();
   }
-  else
+  else if (!strWord.isEmpty())
   {
     debug.log(F("Unknown request!"));
     dump();
-    writeWord(F("An error occured while reading serial data."));
+    writeWord(F("Data error!"));
   }
-	debug.log(F("================================================================"));
+  if (!strWord.isEmpty())
+  	debug.log(F("================================================================"));
 }
 
 #ifdef AUTO_SOLENOID

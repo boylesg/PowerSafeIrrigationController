@@ -26,20 +26,21 @@ class CProgramStation
     // Interface
     void readProgramPageData(CTextFile& file);
     void saveProgramPageData(CTextFile& file);
-    bool read(CTextFile& file, CDate& dateNow, uint8_t nStationNum, uint8_t nDigitalPinNum);
+    bool read(CTextFile& file, CDate& dateNow, const uint8_t nStationNum, const uint8_t nDigitalPinNum);
     bool readAlarms(CTextFile& file, const uint8_t nStationNum, const uint8_t nProbePinNum);
     void dump();
     void dumpPageData();
     bool getRun(CDate dateNow, CTime timeNow, CList* pRunList);
-    bool checkAlarms(const float fElapsedMinutes, CString& strMessage, CList *pList);
+    bool checkAlarms(const uint32_t nElapsedSecs, CString& strMessage, CList *pList);
     void stationOn(const uint16_t nMinutes, CTimer* pTimer, CSerialManager* pSerialManager);
     void stationOff(CTimer* pTimer, CSerialManager* pSerialManager);
     bool isEmpty();
     void empty();
     bool isDone();
-    void setDescription(const char* strDesc)
+    void setDescription(const char* strDesc);
+    inline char* getDescription()
     {
-      strncpy(m_strDescription, strDesc, m_nDescBuffLen);
+      return m_buffDescription;
     };
 
   protected:
@@ -52,8 +53,6 @@ class CProgramStation
     bool findStation(CTextFile& file, const uint8_t nStation, CString& strLine);
     bool parseStarts(char* strLine, char* strTime, uint8_t& nRuntimeMinutes);    
     
-    static const uint16_t m_nDescBuffLen = 31;
-
   public:
     // For web page data persistence
     uint8_t m_nRadioFreq, m_nSelectFreq, m_nRunFreq;
@@ -65,7 +64,7 @@ class CProgramStation
     CDate m_dateSuspendStart, m_dateSuspendEnd;
     bool m_bMoistureProbe, m_bProbeAuto;
     CProgramStart m_arrayStarts[MAX_STARTS];
-    char m_strDescription[m_nDescBuffLen];
+    CBuff<20> m_buffDescription;
     #ifdef AUTO_SOLENOID
       IPAddress m_ipAddr;
       bool m_bActive;
@@ -74,5 +73,7 @@ class CProgramStation
 
 
 #endif
+
+
 
 

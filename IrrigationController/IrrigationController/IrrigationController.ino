@@ -1,4 +1,4 @@
-  #include <RealTimeClockDS1307.h>
+#include <RealTimeClockDS1307.h>
 #include <TimeLib.h>
 #include <Wire.h>
 #include <MyBase64.h>
@@ -23,7 +23,6 @@
 
 CWifiManager WifiManager(&serialESP8266);
 CSerialManager SerialManager(WifiManager, program);
-CTime timeLastAlarms;
 
 
 
@@ -35,28 +34,28 @@ bool initSD()
 {
   bool bResult = false;
 
-  debug.log(F("Initializing SD card..."), false);
+  debug.logEventOpen('*', F("Initializing SD card..."));
   if (!SD.begin(10, 11, 12, 13)) 
-    debug.log(F("failed!"));
+    debug.logEventClose('*', F("failed"));
   else
   {
-    debug.log(F("done!"));
+    debug.logEventClose('*', F("done"));
     bResult = true;
   }
   return bResult;
 }
 
 //******************************************************************************************
-//* Runs at 24 hour intervals
+//* Runs at weekly intervals
 //******************************************************************************************
 void OnWeeklyTimer()
 {
-  debug.log(F("**************************"));
-  debug.log(F("WEEKLY TIMER"));  
-  debug.log(F("-------------"));
+  debug.logEventOpen('*', F("WEEKLY TIMER"));
+  debug.log(F("Battery voltage = "), false);
+  debug.log(WifiManager.getRTCBatteryVoltage());
   WifiManager.checkLowRTCBatteryVoltage();
   WifiManager.synchClock();
-  debug.log(F("**************************"));
+  debug.logEventClose('*', F(""));
 }
 
 //**************************************************************************************************
@@ -64,14 +63,24 @@ void OnWeeklyTimer()
 //**************************************************************************************************
 void OnAlarmsTimer()
 {
+  static CTime timeLastAlarm(rtc);
+  CTime timeNow(rtc);
+  
   rtc.readClock();
-  CTime time(rtc);
-  debug.log(F("********** ALARMS TIMER "), false);  
-  debug.log(time.toString(false));  
-  debug.log(F(" **********"));  
-  debug.dump(F("Time last alarm"), timeLastAlarms.toString());
-  timeLastAlarms = program.checkAlarms(WifiManager, timeLastAlarms);
-  debug.dump(F("Time last alarm"), timeLastAlarms.toString());
+  CBuff<512> buffMsg;
+  CBuff<32> buffSubject;
+  CString strMessage(buffMsg), strSubject(buffSubject);
+  debug.logEventOpen('*', F("ALARMS TIMER"), true);
+  debug.log(F("Time last alarm: "), false);
+  debug.log(timeLastAlarm.toString());
+  if (program.checkAlarms(WifiManager, timeNow - timeLastAlarm, strSubject, strMessage))
+  {
+    timeLastAlarm = timeNow;
+  }
+  debug.log(F("Time this alarm: "), false);
+  debug.log(timeNow .toString(false));
+  debug.log(F("Details: "));
+  debug.logEventClose('*', strMessage);
 }
 
 //******************************************************************************************
@@ -81,26 +90,35 @@ uint8_t g_nNewDayFlag = 0;
 
 void On1MinTimer()
 {
-  debug.log(F("********** 1 MINUTE TIMER **********"));  
-
   rtc.readClock();
   if ((rtc.getHours() == 0) && (g_nNewDayFlag == 0))
     g_nNewDayFlag = 1;
   else if ((rtc.getHours() > 0) && (g_nNewDayFlag == 2))
     g_nNewDayFlag = 0;
   
+  debug.logEventOpen('*', F("1 MINUTE TIMER"), true);
+
   // Then iterate through all the programs, for all stations and for today's date, and we need to run any of them based on the current time.
   program.run(SerialManager);
-
+  debug.logEventClose('*', F(""));
+  
   // A new day has started so we need to read the program.txt and get the irrigations times for the new date so read in the program for each station for the new date.
   if (g_nNewDayFlag == 1)
   {
+    #ifdef LOG
+      if (!debug.startLogFile())
+        debug.logRuntimeError(F("IrrigationController.ino"), __LINE__);
+    #endif
     g_nNewDayFlag = 2;
-    debug.init();
-    
-    debug.log(F("********** NEW DAY **********"));
+
+    CTime time(rtc);
+    debug.logEventOpen('*', F("NEW DAY"), true);
+    debug.log(F("Time: "), false);
+    debug.log(time.toString(false));
+    debug.logEventClose('*', F("Reading irrigation settings from SD card!"));
     if (!program.read())
       debug.logRuntimeError(F("IrrigationController.ino"), __LINE__);
+    
   }
 }
 
@@ -117,19 +135,23 @@ void setup()
 
   // Wait for serial port to connect - needed for native USB port only
   delay(10);
-
-  if (initSD() && WifiManager.begin() && program.read())
+  
+  if (initSD() && WifiManager.begin())
   {
-    program.begin(SerialManager, WifiManager.getUDPServer());
-    debug.init();
-    rtc.readClock();
-    timeLastAlarms.set(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds());
-    timers.add(100, MINUTE, On1MinTimer);
-    timers.add(101, WEEKLY, OnWeeklyTimer);
-    #ifndef AUTO_SOLENOID
-      timers.add(102, FIVE_MINUTES, OnAlarmsTimer);
+    #ifdef LOG
+      if (!debug.startLogFile())
+        debug.logRuntimeError(F("IrrigationController.ino"), __LINE__);
     #endif
-    debug.log(F("Setup() complete..."));
+    program.begin(SerialManager, WifiManager.getUDPServer());
+    if (program.read())
+    {
+      timers.add(100, MINUTE, On1MinTimer);
+      timers.add(101, WEEKLY, OnWeeklyTimer);
+      #ifndef AUTO_SOLENOID
+        timers.add(102, FIVE_MINUTES, OnAlarmsTimer);
+      #endif
+      debug.log(F("Setup() complete..."));
+    }
   }
   else
   {
@@ -141,12 +163,14 @@ void setup()
 void loop()
 {
   timers.poll();
-  
+    
   if (serialHC05.available() > 0)
     SerialManager.processData(&serialHC05);
 
   // Listen for incoming clients
   WifiManager.processRequest();
 }
+
+
 
 

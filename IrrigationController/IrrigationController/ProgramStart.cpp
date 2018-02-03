@@ -18,8 +18,9 @@ bool CProgramStart::parseStartRun(CString& strLine, CTime& timeNow)
 {
   bool bResult = true;
   int8_t nPos = 0;
-  char strBuffTime[9], strBuffMinutes[9], strBuffStart[17];
-  CString strTime(strBuffTime, 9), strMinutes(strBuffMinutes, 9), strStart(strBuffStart, 17);
+  CBuff<9> buffTime, buffMin;
+  CBuff<16> buffStart;
+  CString strTime(buffTime), strMinutes(buffMin), strStart(buffStart);
   CTime timeTemp;
 
   if (strLine.length() > 0)
@@ -84,6 +85,7 @@ uint8_t CProgramStart::getRuntime(CTime timeNow)
   }
   return nRuntime;
 }
+
 
 
 

@@ -37,12 +37,18 @@ CProgramStation::~CProgramStation()
 {
 }
 
+void CProgramStation::setDescription(const char* strDesc)
+{
+  CString strDescription(m_buffDescription);
+  strDescription = strDesc;
+}
+
 bool CProgramStation::findDate(CTextFile& file, CDate& dateNow, CString& strLine)
 {
   int8_t nPos = -1;
   bool bResult = false;
-  char strBuff[6];
-  CString strDateNow(strBuff, 6);
+  CBuff<6> buff;
+  CString strDateNow(buff);
   uint64_t nFilePos = file.position();
 
   strDateNow = dateNow.toString();
@@ -106,15 +112,14 @@ void CProgramStation::readProgramStarts(CTextFile& file, CDate& dateNow)
 bool CProgramStation::readDescription(CTextFile& file)
 {
   bool bResult = false;
-  CBuff<6> Buff6;
-  CBuff<32> Buff32;
-  CString strLine(Buff32), strSuspendDate(Buff6), strDesc(m_strDescription, m_nDescBuffLen);
+  CBuff<32> BuffLine;
+  CString strLine(BuffLine), strDescription(m_buffDescription);  
   int8_t nPos = 0;
 
   if (file.readLine(strLine) && (strLine.length() > 0) && (strLine.indexOf(F("description") >= 0)))
   {
     nPos = strLine.indexOf(':');
-    strDesc = strLine.substring(nPos + 1, strLine.length());
+    strDescription = strLine.substring(nPos + 1, strLine.length());
     bResult = true;
   }
   else
@@ -237,6 +242,9 @@ bool CProgramStation::readAlarms(CTextFile& file, const uint8_t nStationNum, con
   }
   else
   {
+    debug.log(F("Can't find alarm details for station "), false);
+    debug.log(nStationNum, false);
+    debug.log(F("!"));
     debug.logRuntimeError(F("ProgramStation.cpp"), __LINE__);
   }
   return bResult;
@@ -245,12 +253,11 @@ bool CProgramStation::readAlarms(CTextFile& file, const uint8_t nStationNum, con
 bool CProgramStation::findStation(CTextFile& file, const uint8_t nStation, CString& strLine)
 {
   int8_t nPos = -1;
-  char strBuffStation[11];
-  CString strStation(strBuffStation, 11);
+  CBuff<12> buffStation;
+  CString strStation(buffStation);
 
   strStation = F("station");
   strStation += fromUint(nStation, 10);
-
   while (!file.eof() && (nPos < 0))
   {
     file.readLine(strLine);
@@ -269,7 +276,7 @@ void CProgramStation::saveProgramPageData(CTextFile& file)
 	strStation = F("station");
 	strStation += fromUint(m_nStationNum, 10);
 	file.writeLine(strStation);
-	file.writeLine(m_strDescription);
+	file.writeLine(m_buffDescription);
 	file.writeLine(m_nRadioFreq);
 	file.writeLine(m_nSelectFreq);
 	file.writeLine(m_nRunFreq);
@@ -288,10 +295,10 @@ void CProgramStation::saveProgramPageData(CTextFile& file)
 
 void CProgramStation::readProgramPageData(CTextFile& file)
 {
-  CBuff<256> Buff256;
-  CString strLine(Buff256);
-  CString strDesc(m_strDescription, m_nDescBuffLen);
-
+  CBuff<256> BuffLine;
+  CString strLine(BuffLine);
+  CString strDesc(m_buffDescription);
+  
   file.readLine(strLine); // station1
   file.readLine(strDesc);
 
@@ -332,18 +339,12 @@ bool CProgramStation::read(CTextFile& file, CDate& dateNow, uint8_t nStationNum,
 {
   bool bResult = true;
   CBuff<256> Buff256;
-  CBuff<16> Buff16;
-  CString strLine(Buff256),
-          strRunFilename(Buff16);
+  CString strLine(Buff256);
   uint8_t nNum = 0;
 
   m_nStationNum = nStationNum;
-  strRunFilename = F("station");
-  strRunFilename += fromUint(m_nStationNum, 10);
-  strRunFilename += F(".txt");
 
   m_nRelayPinNum = nDigitalPinNum;
-
   if (findStation(file, nStationNum, strLine))
   {
     bResult = true;
@@ -353,7 +354,6 @@ bool CProgramStation::read(CTextFile& file, CDate& dateNow, uint8_t nStationNum,
   }
   else if (file.eof())
   {
-
     debug.logRuntimeError(F("ProgramStation.cpp"), __LINE__);
     debug.dump(F("nStationNum"), nStationNum);
   }
@@ -379,28 +379,28 @@ void CProgramStation::dump()
   debug.log(F("station"), false);
   debug.log(fromUint(m_nStationNum, 10), true);
 
-  debug.log(F("\tdescription:"), false);
-  debug.log(m_strDescription);
+  debug.log(F("\tdescription: "), false);
+  debug.log(m_buffDescription);
 
-  debug.log(F("\tprobe:"), false);
+  debug.log(F("\tprobe: "), false);
   if (m_bMoistureProbe)
     debug.log(F("installed"));
   else
     debug.log(F(""));
 
-  debug.log(F("\tallowed_dry_time:"), false);
+  debug.log(F("\tallowed_dry_time: "), false);
   debug.log(fromUint(m_nAllowedDryTimeMinutes, 10));
-  debug.log(F("\tprobe_threshold_value:"), false);
+  debug.log(F("\tprobe_threshold_value: "), false);
   debug.log(fromUint(m_nProbeThreshold, 10), true);
-  debug.log(F("\tprobe_auto:"), false);
+  debug.log(F("\tprobe_auto: "), false);
   if (m_bProbeAuto)
     debug.log(F("yes"));
   else
     debug.log(F(""));
-  debug.log(F("\tauto_run_time:"), false);
+  debug.log(F("\tauto_run_time: "), false);
   debug.log(fromUint(m_nAutoRunMinutes, 10), true);
 
-  debug.log(F("\tsuspend:"), false);
+  debug.log(F("\tsuspend: "), false);
   if (!m_dateSuspendStart.isEmpty() && !m_dateSuspendEnd.isEmpty())
   {
     debug.log(m_dateSuspendStart.toString(), false);
@@ -413,7 +413,7 @@ void CProgramStation::dump()
   CDate date(rtc);
   debug.log(F("\t"), false);
   debug.log(date.toString(false), false);
-  debug.log(F("="), false);
+  debug.log(F(": "), false);
 
   bool bFlag = false;
   for (uint8_t nI = 0; nI < MAX_STARTS; nI++)
@@ -451,12 +451,15 @@ void CProgramStation::stationOff(CTimer* pTimer, CSerialManager* pSerialManager)
   #else
     digitalWrite(m_nRelayPinNum, LOW);
   #endif
+  CTime time(rtc);
+  debug.logEventOpen('#', F("STATION OFF"), true);
   debug.log(F("Station "), false);
   debug.log(m_nStationNum, false);
-  debug.log(F(" is off..."), false);
-  CTime time(rtc);
-  debug.log(time.toString(true), true);
+  debug.log(F(" turned off at "), false);
+  debug.log(time.toString(true), false);
+  debug.log(F("!"));
   pTimer->clear();
+  debug.logEventClose('#', F(""));
 }
 
 void CProgramStation::stationOn(const uint16_t nMinutes, CTimer* pTimer, CSerialManager* pSerialManager)
@@ -476,11 +479,16 @@ void CProgramStation::stationOn(const uint16_t nMinutes, CTimer* pTimer, CSerial
   #else
     digitalWrite(m_nRelayPinNum, HIGH);
   #endif
+  CTime time(rtc);
+  debug.logEventOpen('#', F("STATION ON"), true);
   debug.log(F("Station "), false);
   debug.log(m_nStationNum, false);
-  debug.log(F(" is on..."), false);
-  CTime time(rtc);
-  debug.log(time.toString(true), true);
+  debug.log(F(" turned on at "), false);
+  debug.log(time.toString(true), false);
+  debug.log(F(" for "), false);
+  debug.log(nMinutes, false);
+  debug.log(F(" minute(s)!"));
+  debug.logEventClose('#', F(""));
 
   g_nStationNum = m_nStationNum;
   g_pTimer = pTimer;
@@ -488,48 +496,30 @@ void CProgramStation::stationOn(const uint16_t nMinutes, CTimer* pTimer, CSerial
   pTimer->set(m_nStationNum, nMinutes * 60, turnStationOff);
 }
 
-bool CProgramStation::checkAlarms(const float fElapsedMinutes, CString& strMessage, CList *pList)
+bool CProgramStation::checkAlarms(const uint32_t nElapsedSecs, CString& strMessage, CList *pList)
 {
   bool bResult = false;
 
   if (m_bMoistureProbe)
   {
-    if (fElapsedMinutes > (float)m_nAllowedDryTimeMinutes)
+    if (nElapsedSecs > (uint32_t)m_nAllowedDryTimeMinutes * 60)
     {
-      float fExcessMin = fElapsedMinutes - m_nAllowedDryTimeMinutes;
-      uint8_t nExcessMin = (uint8_t)floor(fExcessMin), nExcessSec = (uint8_t)((fExcessMin - floor(fExcessMin)) * 60), nSoilReading = analogRead(m_nProbePinNum) * (100.0 / 1023);
-
+      uint16_t nExcessMin = (nElapsedSecs / 60) - m_nAllowedDryTimeMinutes,
+               nExcessSec = nElapsedSecs % 60,
+               nSoilReading = analogRead(m_nProbePinNum) * (100.0 / 1023);
+      
       if (nSoilReading <= m_nProbeThreshold)
       {
         bResult = true;
-
-        strMessage += F("Soil moisture levels for station ");
-        strMessage += fromUint(m_nStationNum, 10);
-        strMessage += F(" has been below the specified threshold for ");
-        strMessage += fromUint(nExcessMin, 10);
-        if ((nExcessMin > 1) || (nExcessMin == 0))
-          strMessage += F(" minutes");
-        else
-          strMessage += F(" minute");
-
-        if (nExcessSec > 1)
-        {
-          strMessage += F(" and ");
-          strMessage += fromUint(nExcessSec, 10);
-          strMessage += F(" seconds");
-        }
-        else if (nExcessSec == 1)
-        {
-          strMessage += F(" and ");
-          strMessage += fromUint(nExcessSec, 10);
-          strMessage += F(" second");
-        }
-        strMessage += F(" more than the specified limit (");
-        strMessage += fromUint(m_nAllowedDryTimeMinutes, 10);
-        if (m_nAllowedDryTimeMinutes > 1)
-          strMessage += F(" minutes)!\r\n");
-        else
-          strMessage += F(" minute)!\r\n");
+        strMessage += F("Station ");
+        strMessage += fromUint(m_nStationNum, DEC);
+        strMessage += F(": moisture level below threshold for ");
+        strMessage += fromUint(nExcessMin, DEC);
+        strMessage += F(" minute(s) and ");
+        strMessage += fromUint(nExcessSec, DEC);
+        strMessage += F(" second(s) more that allowed duration of ");
+        strMessage += fromUint(m_nAllowedDryTimeMinutes, DEC);
+        strMessage += F(" minute(s)");
 
         if (m_bProbeAuto && !pList->isRunning(m_nStationNum))
         {
@@ -601,6 +591,8 @@ bool CProgramStation::getRun(CDate dateNow, CTime timeNow, CList* pRunList)
   }
   return nRuntime > 0;
 }
+
+
 
 
 

@@ -38,38 +38,38 @@ class CWifiManager
 		void updateSytemTime(CDateTime &datetime, const bool bAdjustDaylighSavings, const uint8_t nTimezoneAdjust, const char *strID, CString &strMsg);
 
 		// Miscellaneous
-		bool sendEmail(CString& strSubject, CString& strMsg);
+		bool sendEmail(const char* strSubject, const char* strMsg);
 		bool checkLowRTCBatteryVoltage();
 		void synchClock();
 
 		// Individual data items
 		const char* getControllerID()
 		{
-			return m_strControllerID;
+			return m_buffControllerID;
 		}
 		const char* getNetworkName()
 		{
-			return m_strNetworkName;
+			return m_buffNetworkName;
 		}
 		const char* getNetworkKey()
 		{
-			return m_strNetworkKey;
+			return m_buffNetworkKey;
 		}
 		const char* getEmailAddress()
 		{
-			return m_strToEmail;
+			return m_buffToEmail;
 		}
 		const char* getMailServer()
 		{
-			return m_strMailServer;
+			return m_buffMailServer;
 		}
 		const char* getUsername()
 		{
-			return m_strUsername;
+			return m_buffUsername;
 		}
 		const char* getPassword()
 		{
-			return m_strPassword;
+			return m_buffPassword;
 		}
 		bool getDaylightSavings()
 		{
@@ -84,6 +84,8 @@ class CWifiManager
       return &m_UDPServer;
     };
 
+    float getRTCBatteryVoltage();
+
 	protected:
 		// Helper functions
 		bool readEmailSettings();
@@ -93,9 +95,9 @@ class CWifiManager
 		void processHTTPResponse(WiFiEspClient& WifiClient);
 		void processHTTPRequest(WiFiEspClient &WifiClient, CString &strRequest);
 		void processUDPRequest(WiFiEspUDP *pUDPServer);
-    void processWirlessAlarmData(CString &strRequest);
+    bool processLoginFormData(CString& strFormData);
 
-		float getRTCBatteryVoltage();
+    bool sendLogFileContent(WiFiEspClient& WifiClient);
 		bool sendIrrigProgContent(WiFiEspClient& WifiClient, const bool bFormResponse, const char* strMsg);
 		bool sendManualContent(WiFiEspClient& WifiClient, uint8_t nStation, const uint16_t nRuntime, const uint8_t nStatus);
 		bool sendAlarmContent(WiFiEspClient& WifiClient, const bool bFormResponse, const char* strMsg);
@@ -103,6 +105,7 @@ class CWifiManager
 		bool sendSystemClockContent(WiFiEspClient& WifiClient, const bool bFormResponse, const char* strMsg);
 		bool sendFile(WiFiEspClient& WifiClient, const char* strFileName);
 		bool sendIcon(WiFiEspClient& WifiClient);
+    bool sendLoginContent(WiFiEspClient& WifiClient, const __FlashStringHelper* strMsg);
 		#ifndef __SAM3X8E__
 			void sendFileErrorResponse(WiFiEspClient& WifiClient, const __FlashStringHelper* strFileName);
 		#endif
@@ -114,7 +117,7 @@ class CWifiManager
 		bool processAlarmFormData(CString& strFormData, CString& strMsg);
 		bool processEmailFormData(CString& strFormData, CString& strMsg);
 		bool isHexDigit(const char cCh);
-		void displayError(const __FlashStringHelper* strFilename);
+		void debugFileError(const __FlashStringHelper* strFilename, const bool bFind);
 		void writeToClient(WiFiEspClient& WifiClient, const __FlashStringHelper* strData, const int nLength);
 		void writeToClient(WiFiEspClient& WifiClient, const char* strData, const int nLength);
 		void sendHTTPHeader(WiFiEspClient& WifiClient);
@@ -124,36 +127,18 @@ class CWifiManager
 		WiFiEspUDP m_UDPServer;
 		Stream* m_pSerial;
 
-		// Data - http file names
-		const __FlashStringHelper* m_strHTTPProgramFilename;
-		const __FlashStringHelper* m_strHTTPManualFilename;
-		const __FlashStringHelper* m_strHTTPAlarmsFilename;
-		const __FlashStringHelper* m_strHTTPClockFilename;
-		const __FlashStringHelper* m_strHTTPEmailFilename;
-    const __FlashStringHelper* m_strHTTPUploadFilename;
-
-		// Data - text based data file names
-		const __FlashStringHelper* m_strTXTWifiFilename;
-		const __FlashStringHelper* m_strFaviconFileName;
-		const __FlashStringHelper* m_strTXTEmailFilename;
-		const __FlashStringHelper* m_strTXTTimezoneFilename;
-
 		// Data - miscellaneous
-		const float m_fMinRTCBatteryVoltage;
-		uint16_t m_nBytesRead, m_nSendDelay;
+    int32_t m_nSessionTimer;
 
 		// Data - wifi stuff
-		CBuff<41> m_buffNetworkName, m_buffNetworkKey;
-		CString m_strNetworkName, m_strNetworkKey;
+		CBuff<24> m_buffNetworkName, m_buffNetworkKey;
     
 		// Data - email stuff
-		CBuff<41> m_buffFromEmail, m_buffToEmail, m_buffMailServer, m_buffUsername, m_buffPassword;
-    CBuff<17> m_buffIPAddr;
-		CString m_strFromEmail, m_strToEmail, m_strMailServer, m_strUsername, m_strPassword, m_strIPAddr;
+		CBuff<40> m_buffFromEmail, m_buffToEmail, m_buffMailServer, m_buffUsername, m_buffPassword;
+    CBuff<16> m_buffIPAddr;
 
 		// Data - controller ID
-		CBuff<13> m_buffControllerID;
-		CString m_strControllerID;
+		CBuff<12> m_buffControllerID;
 
 		// Data - clock stuff
 		int8_t m_nTimezone;
@@ -161,5 +146,7 @@ class CWifiManager
 };
 
 #endif
+
+
 
 

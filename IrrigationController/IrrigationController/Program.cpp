@@ -16,14 +16,14 @@
   const uint8_t CProgram::m_arrayRelayPinNums[] PROGMEM = {22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52};
   const uint8_t CProgram::m_arrayProbePinNums[] PROGMEM = {21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51};
 #elif defined (__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-  const uint8_t CProgram::m_arrayRelayPinNums[] PROGMEM = {22, 24, 26, 28, 30, 32, 34, 36};
+  const uint8_t CProgram::m_arrayRelayPinNums[] PROGMEM = {38, 40, 42, 44, 46, 48, 50, 52};
   const uint8_t CProgram::m_arrayProbePinNums[] PROGMEM = {A8, A9, A10, A11, A12, A13, A14, A15};
 #elif defined (ESP32)
   const uint8_t CProgram::m_arrayRelayPinNums[] PROGMEM = {36, 39, 34, 35, 32, 33, 25, 26};
   const uint8_t CProgram::m_arrayProbePinNums[] PROGMEM = {27, 14, 12, 13, 9, 10, 11, 15};
 #endif
 
-CProgram::CProgram(): m_strProgramFilename(F("program.txt")), m_strAlarmsFilename(F("walarms.txt")), m_strProgramPageDataFilename(F("progdata.txt"))
+CProgram::CProgram()
 {
   m_pTimer = NULL;
 }
@@ -36,13 +36,10 @@ void CProgram::begin(CSerialManager& SerialManager, const WiFiEspUDP* pSerialSrc
 {
   m_pTimer = timers.add(0, 0, NULL);
   #ifdef AUTO_SOLENOID
-    while (true)
-    SerialManager.getRemoteStations(pSerialSrc, *this);
+     SerialManager.getRemoteStations(pSerialSrc, *this);
   #else
     for (uint8_t nStationNum = 0, nPinNum = 0; nStationNum < MAX_STATIONS; nStationNum++)
     {
-      nPinNum = pgm_read_byte(m_arrayProbePinNums + nStationNum);
-      //pinMode(nPinNum, INPUT);
       nPinNum = pgm_read_byte(m_arrayRelayPinNums + nStationNum);
       pinMode(nPinNum, OUTPUT);
       digitalWrite(nPinNum, LOW);
@@ -71,41 +68,30 @@ void CProgram::begin(CSerialManager& SerialManager, const WiFiEspUDP* pSerialSrc
   }
 #endif
 
-CTime& CProgram::checkAlarms(CWifiManager& WifiManager, CTime& timeLast)
+bool CProgram::checkAlarms(CWifiManager& WifiManager, const uint32_t nSecsElapsed, CString& strSubject, CString& strMessage)
 {
-  static CTime timeCurrent;
-  float fElapsedMinutes = 0;
-  CBuff<256> buffMsg;
-  CBuff<64> buffSubject;
-  CString strAlarmMsg(buffMsg), strSubject(buffSubject);
   bool bAlarmTriggered = false;
   CDateTime datetime(rtc);
   
-  strSubject = F("Soil moisture alarm trigered for '");
+  strSubject = F("Soil moisture alarm trigered");
   strSubject += WifiManager.getControllerID();
-  strSubject += F("' - ");
-
   strSubject += datetime.toString();
-  rtc.readClock();
-  timeCurrent.set(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds());
-  fElapsedMinutes = (float)(timeCurrent - timeLast) / 60;
 
   for (uint8_t nI = 0; nI < MAX_STATIONS; nI++)
   {
-    if (m_arrayStations[nI].checkAlarms(fElapsedMinutes, strAlarmMsg, &m_listRun))
+    if (m_arrayStations[nI].checkAlarms(nSecsElapsed, strMessage, &m_listRun))
     {
-      bAlarmTriggered = true;
+      bAlarmTriggered |= true;
     }
   }
   if (bAlarmTriggered)
   {
-    WifiManager.sendEmail(strSubject, strAlarmMsg);
-    debug.log(strSubject);
-    debug.dump(F("Message"), strAlarmMsg);
-    debug.log(F("\n"));
-    timeLast = timeCurrent;
+    WifiManager.sendEmail(strSubject, strMessage);
   }
-  return timeLast;
+  else
+    strMessage = F("No action taken");
+  
+  return bAlarmTriggered;
 }
 
 uint8_t CProgram::getAlarmThreshold(const int nStation)
@@ -268,8 +254,9 @@ const char* CProgram::getStationDesc(const uint8_t nStation)
   char* strDesc = strBlank;
   
   if ((nStation >= 1) && (nStation <= 8))
-    strDesc = m_arrayStations[nStation - 1].m_strDescription;
-
+  {
+    strDesc = m_arrayStations[nStation - 1].getDescription();
+  }
   return strDesc;
 }
 
@@ -320,6 +307,7 @@ void CProgram::stationOff(const uint8_t nStation, CTimer* pTimer, CSerialManager
   if ((nStation >= 1) && (nStation <= MAX_STATIONS))
   {
     m_arrayStations[nStation - 1].stationOff(pTimer, pSerialManager);
+    while (m_listRun.remove(nStation));
   }
 }
 
@@ -396,9 +384,9 @@ uint8_t CProgram::getDayInterval(const uint8_t nRadioFreq, const uint8_t nSelFre
   uint8_t nDayInterval = 1;
   switch (nRadioFreq)
   {
-    case 0: nDayInterval = (nSelFreq + 1) * 30; break;
-    case 1: nDayInterval = (nSelFreq + 1) * 7; break;
-    case 2: nDayInterval = nSelFreq + 1; break;
+    case 1: nDayInterval = (nSelFreq + 1) * 30; break;
+    case 2: nDayInterval = (nSelFreq + 1) * 7; break;
+    case 3: nDayInterval = nSelFreq + 1; break;
   }
   return nDayInterval;
 }
@@ -422,8 +410,8 @@ uint8_t CProgram::getHourInterval(const uint8_t nRunFreq)
 
 const char* CProgram::getStartTimes(const char* strStartTime, const char* strEndTime, const uint8_t nNumHours, const uint8_t nRunMins)
 {
-  static char strBuff[129];
-  CString str(strBuff, 129);
+  static CBuff<128> buff;
+  CString str(buff);
   CTime timeEnd, timeCurr;
   uint8_t nCurrHour = 0, nEndHour = 0, nStartHour = 0;
 
@@ -461,7 +449,7 @@ const char* CProgram::getStartTimes(const char* strStartTime, const char* strEnd
 
     str[str.length() - 1] = 0;
   }
-  return strBuff;
+  return buff;
 }
 
 bool CProgram::openIrrigProgramFile(CTextFile& file, CString &strMsg)
@@ -470,7 +458,7 @@ bool CProgram::openIrrigProgramFile(CTextFile& file, CString &strMsg)
 	CBuff<16> Buff16;
 	CString strFilename(Buff16);
 
-	strFilename = m_strProgramFilename;
+	strFilename = fstr_TXT_PROGRAM;
 	if (SD.exists(strFilename))
 	{
 		if (file.open(strFilename, REWRITE))
@@ -493,7 +481,7 @@ bool CProgram::openIrrigProgramPageDataFile(CTextFile& file, CString &strMsg)
 	CBuff<16> Buff16;
 	CString strFilename(Buff16);
 
-	strFilename = m_strProgramPageDataFilename;
+	strFilename = fstr_TXT_PROG_PAGE;
 	if (SD.exists(strFilename))
 	{
 		if (file.open(strFilename, REWRITE))
@@ -514,34 +502,55 @@ void CProgram::saveIrrigProg(const uint8_t nStationNum, CTextFile& fileIrrigProg
 {
   rtc.readClock();
   CDate date(1, 1, rtc.getYear());
-  char strBuff[129];
-  CString strLine(strBuff, 129);
+  CBuff<128> buff;
+  CBuff<8> buffStartDate, buffEndDate;
+  CString strLine(buff), strStartDate(buffStartDate), strEndDate(buffEndDate);
   uint16_t nYear = date.getYear();
-
-  strLine = F("station");
-  strLine += fromUint(nStationNum, 10);
-  fileIrrigProg.writeLine(strLine);
-  fileIrrigProg.write(F("\tdescription:"));
-  fileIrrigProg.writeLine(strDesc);
-  strLine = F("\tsuspend:");
-  if ((strlen(strSuspendStartDate) > 0) && (strlen(strSuspendEndDate) > 0))
+/*
+debug.dump(F("nStationNum"), nStationNum);
+debug.dump(F("nNumDays"), nNumDays);
+debug.dump(F("strStartTime"), strStartTime);
+debug.dump(F("strEndTime"), strEndTime);
+debug.dump(F("nNumHours"), nNumHours);
+debug.dump(F("nRunMins"), nRunMins);
+debug.dump(F("strSuspendStartDate"), strSuspendStartDate);
+debug.dump(F("strSuspendEndDate"), strSuspendEndDate);
+debug.dump(F("strDesc"), strDesc);
+debug.log(F("-----------------------------------"));
+*/
+  strStartDate = strSuspendStartDate;
+  strStartDate.trim();
+  strEndDate = strSuspendEndDate;
+  strEndDate.trim();
+  
+  if (fileIrrigProg)
   {
-    strLine += strSuspendStartDate;
-    strLine += F("-");
-    strLine += strSuspendEndDate;
-  }
-  fileIrrigProg.writeLine(strLine);
-
-  if (nRunMins > 0)
-  {
-    while (nYear == date.getYear())
+    strLine = F("station");
+    strLine += fromUint(nStationNum, 10);
+    fileIrrigProg.writeLine(strLine);
+    fileIrrigProg.write(F("\tdescription:"));
+    fileIrrigProg.writeLine(strDesc);
+    strLine = F("\tsuspend:");
+    if ((strlen(strSuspendStartDate) > 0) && (strlen(strSuspendEndDate) > 0))
     {
-      strLine = F("\t");
-      strLine += date.toString(false);
-      strLine += F("=");
-      strLine += getStartTimes(strStartTime, strEndTime, nNumHours, nRunMins);
-      fileIrrigProg.writeLine(strLine);
-      date.addDays(nNumDays);
+  debug.log(F("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"));
+      strLine += strStartDate;
+      strLine += F("-");
+      strLine += strEndDate;
+    }
+    fileIrrigProg.writeLine(strLine);
+  
+    if (nRunMins > 0)
+    {
+      while (nYear == date.getYear())
+      {
+        strLine = F("\t");
+        strLine += date.toString(false);
+        strLine += F("=");
+        strLine += getStartTimes(strStartTime, strEndTime, nNumHours, nRunMins);
+        fileIrrigProg.writeLine(strLine);
+        date.addDays(nNumDays);
+      }
     }
   }
 }
@@ -565,7 +574,8 @@ void CProgram::saveIrrigProgPageData(const uint8_t nStationNum, CTextFile& fileI
 		pStationDetails->m_timeEnd.parse(strEndTime);
 		pStationDetails->m_dateSuspendStart.parse(strSuspendStartDate);
 		pStationDetails->m_dateSuspendEnd.parse(strSuspendEndDate);
-		pStationDetails->saveProgramPageData(fileIrrigProgPageData);
+		if (fileIrrigProgPageData)
+		  pStationDetails->saveProgramPageData(fileIrrigProgPageData);
 	}
 }
 
@@ -577,7 +587,7 @@ bool CProgram::saveAlarmsData(CString &strMsg)
 	CProgramStation *pStation = NULL;
 	bool bResult = false;
 
-	strFilename = m_strAlarmsFilename;
+	strFilename = fstr_TXT_WALARMS;
 	if (SD.exists(strFilename))
 	{
 	  if (file.open(strFilename, REWRITE))
@@ -643,7 +653,7 @@ bool CProgram::readProgramPageData()
   CBuff<16> Buff16;
   CString strFilename(Buff16);
   
-  strFilename = m_strProgramPageDataFilename;
+  strFilename = fstr_TXT_PROG_PAGE;
   if (SD.exists(strFilename)) 
   {  
     CTextFile file;
@@ -669,7 +679,8 @@ bool CProgram::read()
   CBuff<16> Buff16;
   CString strFilename(Buff16);
 
-  strFilename = m_strProgramFilename;
+  strFilename = fstr_TXT_PROGRAM;
+
   if (SD.exists(strFilename))
   {
 	  CTextFile fileProgram;
@@ -684,25 +695,25 @@ bool CProgram::read()
 		  if (!bResult)
 		  {
 			  debug.log(F("An error occured while reading '"));
-			  debug.log(m_strProgramFilename);
+			  debug.log(fstr_HTTP_PROGRAM);
 			  debug.log(F("'!"));
 		  }
 	  }
 	  else
 	  {
 		  debug.log(F("Could not open '"), false);
-		  debug.log(m_strProgramFilename);
+		  debug.log(fstr_HTTP_PROGRAM, false);
 		  debug.log(F("'!"));
 	  }
   }
   else
   {
 	  debug.log(F("Could not find '"), false);
-	  debug.log(m_strProgramFilename);
+	  debug.log(fstr_HTTP_PROGRAM, false);
 	  debug.log(F("'!"));
   }
   #ifndef AUTO_SOLENOID
-    strFilename = m_strAlarmsFilename;
+    strFilename = fstr_TXT_WALARMS;
     if (SD.exists(strFilename)) 
     {  
       CTextFile fileAlarms;
@@ -714,8 +725,8 @@ bool CProgram::read()
   
   	  if (!bResult)
   	  {
-    		debug.log(F("An error occured while reading '"));
-    		debug.log(m_strAlarmsFilename);
+    		debug.log(F("An error occured while reading '"), false);
+    		debug.log(fstr_HTTP_WALARMS, false);
     		debug.log(F("'!"));
   	  }
         else
@@ -724,14 +735,14 @@ bool CProgram::read()
       else
   	  {
         debug.log(F("Could not open '"), false);
-  	    debug.log(m_strAlarmsFilename);
+  	    debug.log(fstr_HTTP_WALARMS, false);
   	    debug.log(F("'!"));
   	  }
     }
     else
     {
     	debug.log(F("Could not find '"), false);
-    	debug.log(m_strAlarmsFilename);
+    	debug.log(fstr_HTTP_WALARMS, false);
     	debug.log(F("'!"));
     }
   #endif
@@ -752,7 +763,7 @@ void CProgram::run(CSerialManager& SerialManager)
 {
   if (!m_listRun.isRunning())
   {
-    debug.log(F("********** BUILDING PROGRAM RUN LIST **********\n"));
+    debug.logEventOpen('#', F("BUILDING PROGRAM RUN LIST..."));
     CDate dateNow;
     CTime timeNow;
   
@@ -766,31 +777,28 @@ void CProgram::run(CSerialManager& SerialManager)
     }
     if (m_listRun.size() == 0)
     {
-      debug.log(F("********** NO ACTION **********\n"));
+      debug.logEventClose('#', F("no stations added"));
     }
     else
     {
-      m_listRun.dump();
+      debug.logEventClose('#', F("stations added"));
+      //m_listRun.dump();
     }
   }
   else
   {
     uint8_t nStationNum = 0, nRunMinutes = 0;
   
-    m_listRun.dump();
+    //m_listRun.dump();
     //m_pTimer->dump();
     if (!m_pTimer->isRunning() && m_listRun.getNext(nStationNum, nRunMinutes))
     {
-      debug.log(F("********** EXECUTING PROGRAM RUN LIST "), false);
-      debug.log(nStationNum, false);
-      debug.log(F(" -> "), false);
-      debug.log(nRunMinutes, false);
-      debug.log(F(" minute(s) **********\n"));
-      
+      debug.logEventOpen('*', F("EXECUTING PROGRAM RUN LIST"), true);
       if ((nStationNum >= 1) && (nStationNum <= MAX_STATIONS) && (nRunMinutes > 0))
       {
         m_arrayStations[nStationNum - 1].stationOn(nRunMinutes, m_pTimer, &SerialManager);
       }
+      debug.logEventClose('*', F(""));
     }
   }
 }
@@ -813,5 +821,7 @@ CProgramStation* CProgram::getStationDetails(uint8_t nI)
 }
 
 CProgram program;
+
+
 
 

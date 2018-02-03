@@ -23,20 +23,13 @@ class CSerialManager
     void processData(Stream *pSerialHC05);
     void processData(WiFiEspUDP *pUDPServer);
     bool readWord(CString& strBuff);
-    bool writeWord(const char *strBuff)
-    {
-      writeWord(strBuff, m_pUDPServer->remoteIP(), m_pUDPServer->remotePort());
-    };
-    bool writeWord(const __FlashStringHelper *strBuff)
-    {
-      writeWord(strBuff, m_pUDPServer->remoteIP(), m_pUDPServer->remotePort());
-    };
-    bool writeWord(const char *strBuff, IPAddress ip, const uint16_t nPort = 10002);
-    bool writeWord(const __FlashStringHelper *strBuff, IPAddress ip, const uint16_t nPort = 10002);
+    bool writeWord(const char *strBuff, char *pIPAddr = m_strRemoteIP, const uint16_t nPort = 10004);
+    bool writeWord(const __FlashStringHelper *strBuff, char *strIPAddr = m_strRemoteIP, const uint16_t nPort = 10004);
     const char* getDelim()
     {
       return m_strDelimiter;
     };
+    void setRemote(const char* strIPAddr);
     
 	protected:
 		// Helpers
@@ -63,6 +56,8 @@ class CSerialManager
 		Stream* m_pSerialHC05;
     static const char m_cDelimiter;
     static const char *m_strDelimiter;
+    static char m_strRemoteIP[16];
 };
 
 #endif
+
